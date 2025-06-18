@@ -4,82 +4,63 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <header class="p-3">
+      <h1 class="font-bold text-green-600">G5</h1>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
+    <div class="wrapper text-center">
+      <section class="logo">
+        <img src="./assets/p2.jpeg" alt="logo">
+      </section>
+      <!-- <PriButton >Login</PriButton> -->
+      <!-- <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-      </nav>
+      </nav> -->
     </div>
   </header>
 
   <RouterView />
 </template>
 
-<style scoped>
+<style>
 header {
   line-height: 1.5;
   max-height: 100vh;
+  /* border-radius: 1rem; */
+  /* border: 2px solid var(--color-background-soft); */
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
+.logo img {
   width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
 }
+/* --- Smartphones (landscape) and Small Tablets (portrait) --- */
+/* (e.g., min-width of 576px) */
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+@media (min-width: 360px) and (max-width: 768px) {
+  .logo img {
+    width: 70%;
   }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+  
 }
+
+/* --- Tablets (landscape) and Laptops --- */
+/* (e.g., min-width of 768px) */
+@media (min-width: 768px) and (max-width: 992px) {
+  
+}
+
+/* --- Laptops and Desktops --- */
+/* (e.g., min-width of 992px) */
+@media (min-width: 992px) and (max-width: 1200px) {
+  
+  
+}
+
+/* --- Large Desktops --- */
+/* (e.g., min-width of 1200px) */
+@media (min-width: 1200px) {
+  
+  
+}
+
 </style>
