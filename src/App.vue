@@ -4,42 +4,15 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <header class="p-3">
-      <h1 class="font-bold text-green-600">G5</h1>
-
-    <div class="wrapper text-center">
-      <section class="logo">
-        <img src="./assets/p2.jpeg" alt="logo">
-      </section>
-      <!-- <PriButton >Login</PriButton> -->
-      <!-- <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav> -->
-    </div>
-  </header>
-
   <RouterView />
 </template>
 
-<style>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-  /* border-radius: 1rem; */
-  /* border: 2px solid var(--color-background-soft); */
-}
-
-.logo img {
-  width: 100%;
-}
+<style scoped>
 /* --- Smartphones (landscape) and Small Tablets (portrait) --- */
 /* (e.g., min-width of 576px) */
 
 @media (min-width: 360px) and (max-width: 768px) {
-  .logo img {
-    width: 70%;
-  }
+
   
 }
 

@@ -1,5 +1,7 @@
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
+  --p1-color: #11c290a8;
+  --p2-color: #00bd7e;
   --vt-c-white: #ffffff;
   --vt-c-white-soft: #f8f8f8;
   --vt-c-white-mute: #f2f2f2;
@@ -57,11 +59,12 @@
   margin: 0;
   font-weight: normal;
 }
-
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
+  /* background: #fff; */
+  /* background: #11c290; */
+  background: linear-gradient(180deg, #11c290a8 0%, #ffffff 100%);
+/* background: #13bf69; */
   transition:
     color 0.5s,
     background-color 0.5s;
