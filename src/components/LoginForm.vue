@@ -19,7 +19,7 @@
                     </ul>
                 </PriMessage>
             </div>
-            <PriButton type="submit" severity="primary" label="Login" class="w-full my-4" />
+            <PriButton type="submit" severity="primary" label="Login" class="w-full my-4" :disabled="(!initialValues.email || !initialValues.password) || ($form.email?.invalid || $form.password?.invalid)" />
         </Form>
     </div>
   </div>
@@ -82,7 +82,7 @@ img {
 
 @media (min-width: 360px) and (max-width: 768px) {
   .login-form {
-    width: 85%;
+    width: 90%;
   }
   
 }
