@@ -13,6 +13,38 @@
         class="flex flex-wrap w-full"
         @submit="onFormSubmit"
       >
+        <div class="w-full mb-2 mt-4">
+          <PriInputText
+            name="FullName"
+            type="text"
+            placeholder="Full name"
+            fluid
+            v-model="initialValues.FullName"
+          />
+          <PriMessage
+            v-if="$form.FullName?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            >{{ $form.FullName.error.message }}</PriMessage
+          >
+        </div>
+        <div class="w-full my-2">
+          <PriInputText
+            name="PhoneNumber"
+            type="text"
+            placeholder="Phone number"
+            fluid
+            v-model="initialValues.PhoneNumber"
+          />
+          <PriMessage
+            v-if="$form.PhoneNumber?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            >{{ $form.PhoneNumber.error.message }}</PriMessage
+          >
+        </div>
         <div class="w-full my-2">
           <PriInputText
             name="Email"
@@ -44,7 +76,7 @@
             size="small"
             variant="simple"
           >
-            <ul class="my-0 px-4">
+            <ul class="px-3">
               <li v-for="(error, index) of $form.Password.errors" :key="index">
                 {{ error.message }}
               </li>
@@ -54,13 +86,17 @@
         <CustomButton
           type="submit"
           severity="primary"
-          :label="'Login'"
-          class="w-full my-4"
+          :label="'Sign up'"
+          class="w-full mt-4"
           :loading="loading"
           :disabled="
+            !initialValues.FullName ||
+            $form.FullName?.invalid ||
+            !initialValues.PhoneNumber ||
+            $form.PhoneNumber?.invalid ||
             !initialValues.Email ||
-            !initialValues.Password ||
             $form.Email?.invalid ||
+            !initialValues.Password ||
             $form.Password?.invalid ||
             loading
           "
@@ -80,12 +116,22 @@ import { Form } from "@primevue/forms";
 const toast = useToast();
 const loading = ref(false);
 const initialValues = ref({
+  FullName: "",
+  PhoneNumber: "",
   Email: "",
   Password: "",
 });
 
 const resolver = zodResolver(
   z.object({
+    FullName: z.string().min(1, { message: "Full name is required." }).trim(),
+    PhoneNumber: z
+      .string()
+      .trim()
+      .min(1, { message: "Phone number is requird." })
+      .refine((value) => /^\d+$/.test(value), {
+        message: "Acept only numbers.",
+      }),
     Email: z
       .string()
       .min(1, { message: "Email is required." })
