@@ -6,18 +6,18 @@
   font-weight: normal;
 }
 
-a,
-.green {
+a {
   text-decoration: none;
-  /* color: var(--p2-color); */
+  color: var(--p2-color);
   transition: 0.4s;
   padding: 3px;
 }
 
 @media (hover: hover) {
-  a:hover {
+  /* a:hover {
     background-color: #00bd7e33;
-  }
+    text-decoration: underline;
+  } */
 }
 
 @media (min-width: 1024px) {

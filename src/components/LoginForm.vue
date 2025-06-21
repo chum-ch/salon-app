@@ -51,6 +51,7 @@
             </ul>
           </PriMessage>
         </div>
+        <small>Don't have an account? <router-link to="/signup">Sign up</router-link></small>
         <CustomButton
           type="submit"
           severity="primary"

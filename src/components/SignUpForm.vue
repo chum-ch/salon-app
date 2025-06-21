@@ -83,6 +83,7 @@
             </ul>
           </PriMessage>
         </div>
+        <small class="">Already have an account? <router-link to="/login">Login</router-link></small>
         <CustomButton
           type="submit"
           severity="primary"
@@ -101,6 +102,7 @@
             loading
           "
         />
+
       </Form>
     </div>
   </div>
