@@ -13,7 +13,7 @@
         class="flex flex-wrap w-full"
         @submit="onFormSubmit"
       >
-        <div class="w-full my-2">
+        <div class="w-full mb-2 mt-4">
           <PriInputText
             name="Email"
             type="text"
@@ -52,9 +52,10 @@
           </PriMessage>
         </div>
         <small>Don't have an account? <router-link to="/signup">Sign up</router-link></small>
+
         <CustomButton
           type="submit"
-          severity="primary"
+          :severity="true"
           :label="'Login'"
           class="w-full my-4"
           :loading="loading"
@@ -72,11 +73,28 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
+const $api = inject("$api");
+const refToChildCustomDialog = ref();
+const createStudentInfo = async () => {
+  try {
+    // refToChildCustomDialog.value.openDialog();
+  let classes = await $api.user.listUsers();
+    console.log(classes);
+    
+  } catch (error) {
+    console.log(error);
+    
+  }
+
+};
+const closeDialogStudentForm = () => {
+  refToChildCustomDialog.value.closeDialog();
+};
 
 const toast = useToast();
 const loading = ref(false);
@@ -111,18 +129,18 @@ const resolver = zodResolver(
 );
 
 const onFormSubmit = (e) => {
-  console.log("ad");
-
+  
   if (e.valid) {
-    toast.add({
-      severity: "success",
-      summary: "Form is submitted.",
-      life: 3000,
-    });
+    console.log("ad");
   }
 
   loading.value = true;
   setTimeout(() => {
+     toast.add({
+      severity: "success",
+      summary: "Form is submitted.",
+      life: 3000,
+    });
     loading.value = false;
   }, 2000);
 };

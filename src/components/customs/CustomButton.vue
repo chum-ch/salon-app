@@ -28,6 +28,9 @@ defineProps({
   checkIcon: {
     type: Boolean,
   },
+  signOutIcon: {
+    type: Boolean,
+  },
   userIcon: {
     type: Boolean,
   },
@@ -166,6 +169,8 @@ const objectStyleCSS = ref({
           ? 'pi pi-cloud-upload'
           : timesIcon
           ? 'pi pi-times'
+          : signOutIcon
+          ? 'pi pi-sign-out'
           : barsIcon
           ? 'pi pi-bars'
           : ''

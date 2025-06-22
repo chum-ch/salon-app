@@ -1,8 +1,11 @@
 import './assets/main.css'
 import '/node_modules/primeflex/primeflex.css'
+import 'primeicons/primeicons.css'
+import axios from "axios";
 import { createApp } from 'vue'
 import PrimeVue from 'primevue/config';
 import App from './App.vue'
+import API from "./api/api";
 import router from './router'
 import Aura from '@primeuix/themes/aura';
 import ToastService from 'primevue/toastservice';
@@ -12,10 +15,44 @@ import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import Password from 'primevue/password';
 import InputNumber from 'primevue/inputnumber';
-
+import Card from 'primevue/card';
+import Tag from 'primevue/tag';
+import Menu from 'primevue/menu';
+import Drawer from 'primevue/drawer';
+import Avatar from 'primevue/avatar';
+import Badge from 'primevue/badge';
+import OverlayBadge from 'primevue/overlaybadge';
 // My Customs
 import CustomButton from "./components/customs/CustomButton.vue";
+import CustomDialog from "./components/customs/CustomDialog.vue";
+import CustomCard from "./components/customs/CustomCard.vue";
+import CustomMenu from "./components/customs/CustomMenu.vue";
 const app = createApp(App)
+
+// Config Axios
+axios.interceptors.request.use(
+  (config) => {
+    // Add authentication headers to the request
+    // const token = localStorage.getItem('token'); // Replace with your authentication token retrieval logic
+    // if (token) {
+    //   // config.headers.Authorization = `Bearer ${token}`;
+    // }
+    config.headers.Authorization = "Bearer";
+    return config;
+  },
+  (error) => {
+    console.error("Request Interceptor Error:", error);
+    return Promise.reject(error);
+  }
+);
+// axios.defaults.baseURL = 'https://svc-sms.onrender.com'
+// axios.defaults.baseURL = 'https://chum-api.onrender.com'
+if (import.meta.env.PROD) {
+  // axios.defaults.baseURL = 'https://svc-sms.onrender.com'
+  axios.defaults.baseURL = "https://chum-api.onrender.com";
+} else {
+  axios.defaults.baseURL = "http://localhost:3003";
+}
 
 app.component('PriButton', Button);
 app.component('PriToast', Toast);
@@ -23,13 +60,25 @@ app.component('PriInputText', InputText);
 app.component('PriMessage', Message);
 app.component('PriPassword', Password);
 app.component('PriInputNumber', InputNumber);
+app.component('PriCard', Card);
+app.component('PriTag', Tag);
+app.component('PriMenu', Menu);
+app.component('PriDrawer', Drawer);
+app.component('PriAvatar', Avatar);
+app.component('PriBadge', Badge);
+app.component('PriOverlayBadge', OverlayBadge);
 // Customs
 app.component("CustomButton", CustomButton);
+app.component("CustomDialog", CustomDialog);
+app.component("CustomCard", CustomCard);
+app.component("CustomMenu", CustomMenu);
+app.provide("$api", API(axios));
 app.use(PrimeVue, {
     theme: {
         preset: Aura
     }
 });
+
 app.use(router)
 app.use(ToastService);
 app.mount('#app')

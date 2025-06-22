@@ -158,18 +158,18 @@ const resolver = zodResolver(
 );
 
 const onFormSubmit = (e) => {
-  console.log("ad");
-
   if (e.valid) {
+    console.log("ad");
+  }
+
+  
+  loading.value = true;
+  setTimeout(() => {
     toast.add({
       severity: "success",
       summary: "Form is submitted.",
       life: 3000,
     });
-  }
-
-  loading.value = true;
-  setTimeout(() => {
     loading.value = false;
   }, 2000);
 };
