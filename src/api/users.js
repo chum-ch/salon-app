@@ -1,4 +1,7 @@
 export default (axios)=>({
+    getAvailableCode(data){
+        return axios.post(`/avaliable-code`, data)
+    },
     listUsers(){
         return axios.get(`/users`)
     },

@@ -60,7 +60,7 @@ const openMenu = () => {
 
 <template>
   <div>
-    <div class="sticky top-0 z-1 text-white">
+    <div v-show="false" class="sticky top-0 z-1 text-white">
       <div class="container-menu">
         <PriButton
           class="bg-transparent icon-bars"

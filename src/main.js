@@ -22,6 +22,9 @@ import Drawer from 'primevue/drawer';
 import Avatar from 'primevue/avatar';
 import Badge from 'primevue/badge';
 import OverlayBadge from 'primevue/overlaybadge';
+import RadioButton from 'primevue/radiobutton';
+import RadioButtonGroup from 'primevue/radiobuttongroup';
+
 // My Customs
 import CustomButton from "./components/customs/CustomButton.vue";
 import CustomDialog from "./components/customs/CustomDialog.vue";
@@ -51,7 +54,7 @@ if (import.meta.env.PROD) {
   // axios.defaults.baseURL = 'https://svc-sms.onrender.com'
   axios.defaults.baseURL = "https://chum-api.onrender.com";
 } else {
-  axios.defaults.baseURL = "http://localhost:3003";
+  axios.defaults.baseURL = "http://localhost:3000";
 }
 
 app.component('PriButton', Button);
@@ -67,6 +70,8 @@ app.component('PriDrawer', Drawer);
 app.component('PriAvatar', Avatar);
 app.component('PriBadge', Badge);
 app.component('PriOverlayBadge', OverlayBadge);
+app.component('PriRadioButton', RadioButton);
+app.component('PriRadioButtonGroup', RadioButtonGroup);
 // Customs
 app.component("CustomButton", CustomButton);
 app.component("CustomDialog", CustomDialog);

@@ -30,7 +30,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('../components/LoginForm.vue'),
+      component: () => import('../components/SignInForm.vue'),
     },
     {
       path: '/product',

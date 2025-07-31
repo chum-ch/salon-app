@@ -1,8 +1,7 @@
 <template>
   <div class="login-form p-3">
-    <h1 class="text-white font-bold">G10</h1>
     <div class="logo text-center">
-      <img src="../assets/p2.jpeg" alt="logo" />
+      <img src="/imgs/salon.png" alt="logo" />
     </div>
     <div class="form">
       <PriToast class="w-max" />
@@ -15,25 +14,41 @@
       >
         <div class="w-full mb-2 mt-4">
           <PriInputText
-            name="FullName"
+            name="Name"
             type="text"
-            placeholder="Full name"
+            placeholder="ឈ្មោះហាង"
             fluid
-            v-model="initialValues.FullName"
+            v-model="initialValues.Name"
           />
           <PriMessage
-            v-if="$form.FullName?.invalid"
+            v-if="$form.Name?.invalid"
             severity="error"
             size="small"
             variant="simple"
-            >{{ $form.FullName.error.message }}</PriMessage
+            >{{ $form.Name.error.message }}</PriMessage
           >
+        </div>
+        <div class="w-full my-2">
+          <PriInputText
+            name="Code"
+            placeholder="លេខកូដ"
+            fluid
+            v-model="initialValues.Code"
+          />
+          <PriMessage
+            v-if="$form.Code?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+          >
+            {{ $form.Code.error.message }}
+          </PriMessage>
         </div>
         <div class="w-full my-2">
           <PriInputText
             name="PhoneNumber"
             type="text"
-            placeholder="Phone number"
+            placeholder="លេខទូរស័ព្ទ"
             fluid
             v-model="initialValues.PhoneNumber"
           />
@@ -49,7 +64,7 @@
           <PriInputText
             name="Email"
             type="text"
-            placeholder="Email"
+            placeholder="អ៊ីមែល"
             fluid
             v-model="initialValues.Email"
           />
@@ -61,48 +76,29 @@
             >{{ $form.Email.error.message }}</PriMessage
           >
         </div>
-        <div class="w-full my-2">
-          <PriPassword
-            name="Password"
-            placeholder="Password"
-            :feedback="false"
-            toggleMask
-            fluid
-            v-model="initialValues.Password"
-          />
-          <PriMessage
-            v-if="$form.Password?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-          >
-            <ul class="px-3">
-              <li v-for="(error, index) of $form.Password.errors" :key="index">
-                {{ error.message }}
-              </li>
-            </ul>
-          </PriMessage>
-        </div>
-        <small class="">Already have an account? <router-link to="/login">Login</router-link></small>
+
+        <small class=""
+          >តើអ្នកធ្លាប់បានបង្កើតហាងហើយឬនៅ?
+          <router-link to="/login">ចូលទៅហាង</router-link></small
+        >
         <CustomButton
           type="submit"
           severity="primary"
-          :label="'Sign up'"
+          :label="'បង្កើតថ្មី'"
           class="w-full mt-4"
           :loading="loading"
           :disabled="
-            !initialValues.FullName ||
-            $form.FullName?.invalid ||
+            !initialValues.Name ||
+            $form.Name?.invalid ||
             !initialValues.PhoneNumber ||
             $form.PhoneNumber?.invalid ||
             !initialValues.Email ||
             $form.Email?.invalid ||
-            !initialValues.Password ||
-            $form.Password?.invalid ||
+            !initialValues.Code ||
+            $form.Code?.invalid ||
             loading
           "
         />
-
       </Form>
     </div>
   </div>
@@ -118,42 +114,51 @@ import { Form } from "@primevue/forms";
 const toast = useToast();
 const loading = ref(false);
 const initialValues = ref({
-  FullName: "",
+  Name: "",
   PhoneNumber: "",
   Email: "",
-  Password: "",
+  Code: "",
 });
 
 const resolver = zodResolver(
   z.object({
-    FullName: z.string().min(1, { message: "Full name is required." }).trim(),
+    Name: z.string().min(1, { message: "Full name is required." }).trim(),
     PhoneNumber: z
       .string()
       .trim()
       .min(1, { message: "Phone number is requird." })
       .refine((value) => /^\d+$/.test(value), {
-        message: "Acept only numbers.",
+        message: "No space and acept only numbers.",
       }),
     Email: z
       .string()
       .min(1, { message: "Email is required." })
       .email({ message: "Invalid email address." })
       .trim(),
-    Password: z
-      .string()
-      .min(3, { message: "Minimum 3 characters." })
-      .max(8, { message: "Maximum 8 characters." })
-      .refine((value) => /[a-z]/.test(value) && /[A-Z]/.test(value), {
-        message: "At least one lower and uppercase letter.",
-      })
-      .refine(
-        (value) =>
-          /\d/.test(value) &&
-          /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?~]/.test(value),
-        {
-          message: "At least one number and special character.",
-        }
-      ),
+    // Code: z
+    //   .number({
+    //     required_error: "Code is required.", // Message for when value is missing/undefined
+    //     invalid_type_error: "Code must be a number.", // Message for when value isn't a number
+    //   })
+    //   .int("Code must be an integer.") // Ensures it's a whole number (no decimals)
+    //   .min(1000, { message: "Code must be 4 digits." }) // Minimum 4-digit number
+    //   .max(9999, { message: "Code must be 4 digits." }) // Maximum 4-digit number
+    //   .nullable() // Allows null as a valid initial state if the field is empty
+    // .refine(val => val !== null, { message: "Code is required." }) // Refine to make sure null is not valid for submission
+    Code: z
+      .string() // IMPORTANT: Validate as string first for precise length control
+      .min(1, { message: "Code is required." }) // Ensures the field isn't empty
+      .length(4, { message: "Code must be a 4-digits." }), // Ensures string is exactly 4 characters
+    // .refine((value) => /^\d{4}$/.test(value), {
+    //   message: "Code must be a 4-digit number.", // Ensures all 4 characters are digits
+    // })
+    //   .transform(Number) // Convert to number ONLY after all string checks pass
+    // Code: z
+    //   .union([
+    //     z.number().lte(9999, { message: 'Must be 4 digits.' }),
+    //     z.literal(null)
+    //   ]).refine((val) => val !== null, { message: 'Number is required.' })
+    //   // .union([z.number().gt(0, { message: 'Must be greater than 0.' }).lt(10, { message: 'Must be less than 10.' }), z.literal(null)]).refine((val) => val !== null, { message: 'Number is required.' })
   })
 );
 
@@ -162,7 +167,6 @@ const onFormSubmit = (e) => {
     console.log("ad");
   }
 
-  
   loading.value = true;
   setTimeout(() => {
     toast.add({
