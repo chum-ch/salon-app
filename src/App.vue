@@ -60,25 +60,25 @@ const openMenu = () => {
 
 <template>
   <div>
-    <div v-show="false" class="sticky top-0 z-1 text-white">
+    <div v-show="true" class="sticky top-0 z-1 text-white">
       <div class="container-menu">
         <PriButton
           class="bg-transparent icon-bars"
           icon="pi pi-bars"
           @click="openMenu"
         />
-        <div class="menu">
+        <!-- <div class="menu">
           <router-link to="/product">
             <p>Products</p>
           </router-link>
-        </div>
-        <div clss="relative">
+        </div> -->
+        <!-- <div clss="relative">
           <PriButton
             type="button"
             icon="pi pi-shopping-cart"
             badge="10"
           />
-        </div>
+        </div> -->
       </div>
     </div>
     <CustomMenu ref="refToFunMenu" />
@@ -151,7 +151,7 @@ h3 {
 /* (e.g., min-width of 1200px) */
 @media (min-width: 1200px) {
   .icon-bars {
-    display: none;
+    /* display: none; */
   }
 }
 </style>

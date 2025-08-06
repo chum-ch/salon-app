@@ -1,5 +1,5 @@
 <template>
-  <div class="login-form p-3">
+  <div class="login-form p-3" v-if="isShowFormSignUp">
     <div class="logo text-center">
       <img src="/imgs/salon.png" alt="logo" />
     </div>
@@ -29,11 +29,14 @@
           >
         </div>
         <div class="w-full my-2">
-          <PriInputText
+          <PriInputNumber
             name="Code"
-            placeholder="លេខកូដ"
             fluid
+            placeholder="លេខកូដ"
+            :useGrouping="false"
             v-model="initialValues.Code"
+            @input="checkAvailableCode"
+            :min="0"
           />
           <PriMessage
             v-if="$form.Code?.invalid"
@@ -43,6 +46,22 @@
           >
             {{ $form.Code.error.message }}
           </PriMessage>
+
+          <div
+            class="available-code d-flex flex-wrap"
+            v-if="availableCode.length > 0"
+          >
+            កូដខាងលើបានប្រើហើយ សូមជ្រើសរើសកូដថ្មី។
+            <span
+              class="ml-0 mr-2 text-blue-500 underline"
+              v-for="(code, index) in availableCode"
+              :key="index"
+              @click="getNewCode(availableCode[index])"
+              style="cursor: pointer"
+            >
+              {{ code }}</span
+            >
+          </div>
         </div>
         <div class="w-full my-2">
           <PriInputText
@@ -96,23 +115,28 @@
             $form.Email?.invalid ||
             !initialValues.Code ||
             $form.Code?.invalid ||
-            loading
+            loading ||
+            availableCode.length > 0
           "
         />
       </Form>
     </div>
   </div>
+  <OtpForm :email="initialValues.Email" v-else @onBackClick="onBackClick()" />
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
-
+import OtpForm from "./OtpForm.vue";
 const toast = useToast();
 const loading = ref(false);
+const isShowFormSignUp = ref(true);
+const availableCode = ref([]);
+const $api = inject("$api");
 const initialValues = ref({
   Name: "",
   PhoneNumber: "",
@@ -135,47 +159,68 @@ const resolver = zodResolver(
       .min(1, { message: "Email is required." })
       .email({ message: "Invalid email address." })
       .trim(),
-    // Code: z
-    //   .number({
-    //     required_error: "Code is required.", // Message for when value is missing/undefined
-    //     invalid_type_error: "Code must be a number.", // Message for when value isn't a number
-    //   })
-    //   .int("Code must be an integer.") // Ensures it's a whole number (no decimals)
-    //   .min(1000, { message: "Code must be 4 digits." }) // Minimum 4-digit number
-    //   .max(9999, { message: "Code must be 4 digits." }) // Maximum 4-digit number
-    //   .nullable() // Allows null as a valid initial state if the field is empty
-    // .refine(val => val !== null, { message: "Code is required." }) // Refine to make sure null is not valid for submission
     Code: z
-      .string() // IMPORTANT: Validate as string first for precise length control
-      .min(1, { message: "Code is required." }) // Ensures the field isn't empty
-      .length(4, { message: "Code must be a 4-digits." }), // Ensures string is exactly 4 characters
-    // .refine((value) => /^\d{4}$/.test(value), {
-    //   message: "Code must be a 4-digit number.", // Ensures all 4 characters are digits
-    // })
-    //   .transform(Number) // Convert to number ONLY after all string checks pass
-    // Code: z
-    //   .union([
-    //     z.number().lte(9999, { message: 'Must be 4 digits.' }),
-    //     z.literal(null)
-    //   ]).refine((val) => val !== null, { message: 'Number is required.' })
-    //   // .union([z.number().gt(0, { message: 'Must be greater than 0.' }).lt(10, { message: 'Must be less than 10.' }), z.literal(null)]).refine((val) => val !== null, { message: 'Number is required.' })
+      .union([
+        z.string(),
+        z
+          .number()
+          .int({ message: "Code must be an integer." })
+          .min(1000, { message: "Code must be a 4-digit number." })
+          .max(9999, { message: "Code must be a 4-digit number." }),
+      ])
+      .nullable()
+      .refine((val) => val !== null, {
+        message: "Code is required.",
+      }),
   })
 );
-
-const onFormSubmit = (e) => {
-  if (e.valid) {
-    console.log("ad");
+const onBackClick = () => {
+  isShowFormSignUp.value = true;
+};
+const getNewCode = (newCode) => {
+  availableCode.value = [];
+  initialValues.value.Code = newCode;
+};
+const checkAvailableCode = async (event) => {
+  const code = String(event.value);
+  availableCode.value = [];
+  initialValues.value.Code = event.value;
+  if (event.value && code.length === 4) {
+    try {
+      let codes = await $api.user.getAvailableCode({ CodeShop: Number(code) });
+      availableCode.value = codes.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
+};
+const onFormSubmit = async (e) => {
+  try {
+    if (e.valid) {
+      loading.value = true;
+      const body = {
+        Name: initialValues.value.Name,
+        Code: Number(initialValues.value.Code),
+        Email: initialValues.value.Email,
+        Phone: initialValues.value.PhoneNumber,
+      };
+      console.log(body);
 
-  loading.value = true;
-  setTimeout(() => {
-    toast.add({
-      severity: "success",
-      summary: "Form is submitted.",
-      life: 3000,
-    });
+      // await $api.user.tenantRegister(body);
+      setTimeout(() => {
+        toast.add({
+          severity: "success",
+          summary: "Form is submitted.",
+          life: 3000,
+        });
+        loading.value = false;
+        isShowFormSignUp.value = false;
+      }, 2000);
+    }
+  } catch (error) {
     loading.value = false;
-  }, 2000);
+    console.error(error);
+  }
 };
 </script>
 <style scoped>

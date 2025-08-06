@@ -10,7 +10,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../components/SignInForm.vue'),
+      component: () => import('../views/HomeView.vue'),
     },
     {
       path: '/about',
@@ -23,12 +23,12 @@ const router = createRouter({
     {
       path: '/signup',
       name: 'signup',
-      component: () => import('../components/SignUpForm.vue'),
+      component: () => import('../components/form/SignUpForm.vue'),
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import('../components/SignInForm.vue'),
+      component: () => import('../components/form/SignInForm.vue'),
     },
     {
       path: '/product',

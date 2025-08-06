@@ -1,22 +1,27 @@
 <template>
   <div class="card flex justify-center">
-    <PriDrawer v-model:visible="visible">
+    <PriDrawer v-model:visible="visible" :showCloseIcon="true"
+    >
       <template #header>
-        <div class="flex items-center gap-2">
-          <PriAvatar
+        <div class="w-full text-center flex justify-content-between items-center gap-2 bg-500">
+          <!-- <PriAvatar
             icon="pi pi-user"
             class="mr-2"
             size="large"
             style="background-color: #ece9fc; color: #2a1261"
             shape="circle"
-          />
-          <span class="font-bold mt-2">Hello!</span>
+          /> -->
+          <!-- <img src="../../../public/imgs/salon.png" alt="logo" width="50" /> -->
+          <span class="font-bold mt-2 text-center">អ៊ែលលី~Ellie Salon</span>
         </div>
       </template>
-        <hr />
+      <hr
+        class="mb-4 border-t border-0 border-surface-200"
+      />
       <div class="menu">
         <router-link to="/product" @click="visible = false">
-          <p>Products</p>
+          <p>Products
+          </p>
         </router-link>
       </div>
       <template #footer>

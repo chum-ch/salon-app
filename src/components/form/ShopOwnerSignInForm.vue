@@ -10,13 +10,14 @@
     >
       <div class="w-full shop-owner-input">
         <div class="w-full my-2">
-          <PriInputText
+          <PriInputNumber
             name="ShopOwnerCode"
             type="text"
+            :useGrouping="false"
+            :min="0"
             placeholder="លេខកូដហាង"
             fluid
             v-model="initialValues.ShopOwnerCode"
-            @keyup="checkAvailableCode(initialValues.ShopOwnerCode)"
           />
           <PriMessage
             v-if="$form.ShopOwnerCode?.invalid"
@@ -25,24 +26,6 @@
             variant="simple"
             >{{ $form.ShopOwnerCode.error.message }}
           </PriMessage>
-          <div
-            class="available-code d-flex flex-wrap"
-            v-if="
-              availableCode.length > 0 &&
-              initialValues.ShopOwnerCode.length === 4
-            "
-          >
-            កូដខាងលើបានប្រើហើយ សូមជ្រើសរើសកូដថ្មី។
-            <span
-              class="ml-0 mr-2 text-blue-500 underline"
-              v-for="(code, index) in availableCode"
-              :key="index"
-              @click="getNewCode(availableCode[index])"
-              style="cursor: pointer"
-            >
-              {{ code }}</span
-            >
-          </div>
         </div>
 
         <div class="w-full my-2">
@@ -78,8 +61,7 @@
           !initialValues.ShopOwnerCode ||
           $form.ShopOwnerEmail?.invalid ||
           $form.ShopOwnerCode?.invalid ||
-          loading ||
-          availableCode.length > 0
+          loading
         "
       />
     </Form>
@@ -93,23 +75,8 @@ import { z } from "zod";
 import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
 const $api = inject("$api");
-const availableCode = ref([9995, 2299, 8199]);
 const refToChildCustomDialog = ref();
-const getNewCode = (newCode) => {
-  availableCode.value = [];
-  initialValues.value.ShopOwnerCode = newCode;
-};
-const checkAvailableCode = async (code) => {
-  availableCode.value = [];
-  if (code.length === 4) {
-    try {
-      let codes = await $api.user.getAvailableCode({ CodeShop: Number(code) });
-      availableCode.value = codes.data;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-};
+
 const createStudentInfo = async () => {
   try {
     // refToChildCustomDialog.value.openDialog();
@@ -138,15 +105,24 @@ const resolver = zodResolver(
       .email({ message: "Invalid email address." })
       .trim(),
     ShopOwnerCode: z
-      .string() // IMPORTANT: Validate as string first for precise length control
-      .min(1, { message: "Code is required." }) // Ensures the field isn't empty
-      .length(4, { message: "Code must be a 4-digits." }), // Ensures string is exactly 4 characters
+      .union([
+        z.string(),
+        z
+          .number()
+          .int({ message: "Code must be an integer." })
+          .min(1000, { message: "Code must be a 4-digit number." })
+          .max(9999, { message: "Code must be a 4-digit number." }),
+      ])
+      .nullable()
+      .refine((val) => val !== null, {
+        message: "Code is required.",
+      }),
   })
 );
 
 const onFormSubmit = (e) => {
   if (e.valid) {
-    console.log("ad");
+    console.log("ad", initialValues.value);
   }
 
   loading.value = true;

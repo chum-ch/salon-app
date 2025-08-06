@@ -10,10 +10,12 @@
     >
       <div class="w-full guest-input">
         <div class="w-full my-2">
-          <PriInputText
+          <PriInputNumber
             name="ShopOwnerCode"
             type="text"
             placeholder="លេខកូដហាង"
+            :useGrouping="false"
+            :min="0"
             fluid
             v-model="initialValues.ShopOwnerCode"
           />
@@ -30,7 +32,7 @@
           <PriInputText
             name="GuestName"
             type="text"
-            placeholder="ឈ្មោះអ្នក"
+            placeholder="ឈ្មោះរបស់អ្នក"
             fluid
             v-model="initialValues.GuestName"
           />
@@ -126,28 +128,49 @@ const resolver = zodResolver(
       .refine((value) => /^\d+$/.test(value), {
         message: "No space and acept only numbers.",
       }),
+
     ShopOwnerCode: z
-      .string() // IMPORTANT: Validate as string first for precise length control
-      .min(1, { message: "Code is required." }) // Ensures the field isn't empty
-      .length(4, { message: "Code must be a 4-digits." }), // Ensures string is exactly 4 characters
+      .union([
+        z.string(),
+        z
+          .number()
+          .int({ message: "Code must be an integer." })
+          .min(1000, { message: "Code must be a 4-digit number." })
+          .max(9999, { message: "Code must be a 4-digit number." }),
+      ])
+      .nullable()
+      .refine((val) => val !== null, {
+        message: "Code is required.",
+      }),
   })
 );
 
-const onFormSubmit = (e) => {
-  if (e.valid) {
-    console.log("ad");
-  }
-
-  loading.value = true;
-  setTimeout(() => {
-    toast.add({
-      severity: "success",
-      summary: "Form is submitted.",
-      life: 3000,
-    });
+const onFormSubmit = async (e) => {
+  try {
+    if (e.valid) {
+      loading.value = true;
+      const body = {
+        CodeShop: Number(initialValues.value.ShopOwnerCode),
+        FullName: initialValues.value.GuestName,
+        Phone: initialValues.value.GuestPhoneNumber,
+        UserType: "GUEST",
+      };
+      console.log(body);
+      // let guestLogin = await $api.user.guestLogin(body);
+      // console.log(guestLogin.data);
+      setTimeout(() => {
+        toast.add({
+          severity: "success",
+          summary: "Form is submitted.",
+          life: 3000,
+        });
+        loading.value = false;
+      }, 2000);
+    }
+  } catch (error) {
     loading.value = false;
-  }, 2000);
+    console.log(error);
+  }
 };
 </script>
-<style scoped>
-</style>
+<style scoped></style>

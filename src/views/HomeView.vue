@@ -1,12 +1,9 @@
 <script setup>
-import TheWelcome from "../components/TheWelcome.vue";
-import SignUpForm from "../components/SignUpForm.vue";
-import LoginForm from "../components/LoginForm.vue";
-import Congratulation from "../components/Congratulation.vue";
+import SignInForm from "../components/form/SignInForm.vue";
 </script>
 
 <template>
   <main>
-    <LoginForm />
+    <SignInForm />
   </main>
 </template>

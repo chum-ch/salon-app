@@ -24,6 +24,8 @@ import Badge from 'primevue/badge';
 import OverlayBadge from 'primevue/overlaybadge';
 import RadioButton from 'primevue/radiobutton';
 import RadioButtonGroup from 'primevue/radiobuttongroup';
+import InputOtp from 'primevue/inputotp';
+
 
 // My Customs
 import CustomButton from "./components/customs/CustomButton.vue";
@@ -48,14 +50,15 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+axios.defaults.baseURL = "http://localhost:3000";
 // axios.defaults.baseURL = 'https://svc-sms.onrender.com'
 // axios.defaults.baseURL = 'https://chum-api.onrender.com'
-if (import.meta.env.PROD) {
-  // axios.defaults.baseURL = 'https://svc-sms.onrender.com'
-  axios.defaults.baseURL = "https://chum-api.onrender.com";
-} else {
-  axios.defaults.baseURL = "http://localhost:3000";
-}
+// if (import.meta.env.PROD) {
+//   // axios.defaults.baseURL = 'https://svc-sms.onrender.com'
+//   axios.defaults.baseURL = "https://chum-api.onrender.com";
+// } else {
+//   axios.defaults.baseURL = "http://localhost:3000";
+// }
 
 app.component('PriButton', Button);
 app.component('PriToast', Toast);
@@ -72,6 +75,7 @@ app.component('PriBadge', Badge);
 app.component('PriOverlayBadge', OverlayBadge);
 app.component('PriRadioButton', RadioButton);
 app.component('PriRadioButtonGroup', RadioButtonGroup);
+app.component('PriInputOtp', InputOtp);
 // Customs
 app.component("CustomButton", CustomButton);
 app.component("CustomDialog", CustomDialog);
