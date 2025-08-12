@@ -38,12 +38,14 @@ const isError = ref(false);
 // const closeDialogStudentForm = () => {
 //   refToChildCustomDialog.value.closeDialog();
 // };
-const resendOTP = async (email = "chumcn.dev@gmail.com") => {
+const resendOTP = async (email) => {
   try {
     isShowSpinner.value = true;
-    await $api.user.resendOTP("Tenant:c02fac22e33441dea44ac78851e96a45", {
-      Email: email,
-    });
+    // await $api.user.resendOTP("Tenant:c02fac22e33441dea44ac78851e96a45", {
+    //   Email: email,
+    // });
+    console.log('Rsend to', email);
+    
     setTimeout(() => {
       toast.add({
         severity: "success",
@@ -73,10 +75,10 @@ const onFormSubmit = async (e) => {
       const body = { OTP: Number(initialValues.value.Passcode) };
       console.log(body);
 
-      let otp = await $api.user.sendOTP(
-        "Tenant:c02fac22e33441dea44ac78851e96a45",
-        body
-      );
+      // let otp = await $api.user.sendOTP(
+      //   "Tenant:c02fac22e33441dea44ac78851e96a45",
+      //   body
+      // );
       setTimeout(() => {
         toast.add({
           severity: "success",
@@ -95,9 +97,9 @@ defineEmits(["onBackClick"]);
 </script>
 
 <template>
-  <div class="login-form p-3">
+  <div class="otp-form p-3">
     <i v-if="isShowBackBtn" @click="($event) => $emit('onBackClick', $event)"
-      class="pi pi-chevron-left text-blue-500 bg-blue-50 p-2 border-circle hover:bg-blue-100 cursor-pointer"
+      class="pi pi-chevron-left text-blue-500 bg-blue-50 p-2 border-circle hover:bg-gray-200 cursor-pointer"
     ></i>
     <div class="logo text-center">
       <img src="/imgs/otp.png" alt="logo" />
@@ -172,7 +174,7 @@ defineEmits(["onBackClick"]);
 </template>
 
 <style scoped>
-.login-form {
+.otp-form {
   margin: auto;
   width: 25%;
   box-shadow: #63636333 0px 2px 8px 0px;

@@ -25,13 +25,15 @@ import OverlayBadge from 'primevue/overlaybadge';
 import RadioButton from 'primevue/radiobutton';
 import RadioButtonGroup from 'primevue/radiobuttongroup';
 import InputOtp from 'primevue/inputotp';
-
+import Checkbox from 'primevue/checkbox';
+import CheckboxGroup from 'primevue/checkboxgroup';
 
 // My Customs
 import CustomButton from "./components/customs/CustomButton.vue";
 import CustomDialog from "./components/customs/CustomDialog.vue";
 import CustomCard from "./components/customs/CustomCard.vue";
 import CustomMenu from "./components/customs/CustomMenu.vue";
+import CustomDropdown from "./components/customs/CustomDropdown.vue";
 const app = createApp(App)
 
 // Config Axios
@@ -76,11 +78,14 @@ app.component('PriOverlayBadge', OverlayBadge);
 app.component('PriRadioButton', RadioButton);
 app.component('PriRadioButtonGroup', RadioButtonGroup);
 app.component('PriInputOtp', InputOtp);
+app.component('PriCheckbox', Checkbox);
+app.component('PriCheckboxGroup', CheckboxGroup);
 // Customs
 app.component("CustomButton", CustomButton);
 app.component("CustomDialog", CustomDialog);
 app.component("CustomCard", CustomCard);
 app.component("CustomMenu", CustomMenu);
+app.component("CustomDropdown", CustomDropdown);
 app.provide("$api", API(axios));
 app.use(PrimeVue, {
     theme: {

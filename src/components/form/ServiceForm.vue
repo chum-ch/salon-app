@@ -1,10 +1,6 @@
 <template>
-  <div class="login-form p-3" v-if="isShowFormSignUp">
-  <i v-if="isShowBackBtn" @click="$router.go(-1)"
-      class="pi pi-chevron-left text-blue-500 bg-blue-50 p-2 border-circle hover:bg-gray-200 cursor-pointer"
-    ></i>
+  <div class="service-form">
     <div class="logo text-center">
-      <img src="/imgs/salon.png" alt="logo" />
     </div>
     <div class="form">
       <PriToast class="w-max" />
@@ -19,7 +15,7 @@
           <PriInputText
             name="Name"
             type="text"
-            placeholder="ឈ្មោះហាង"
+            placeholder="ឈ្មោះសេវាកម្ម"
             fluid
             v-model="initialValues.Name"
           />
@@ -49,22 +45,6 @@
           >
             {{ $form.Code.error.message }}
           </PriMessage>
-
-          <div
-            class="available-code d-flex flex-wrap"
-            v-if="availableCode.length > 0"
-          >
-            កូដខាងលើបានប្រើហើយ សូមជ្រើសរើសកូដថ្មី។
-            <span
-              class="ml-0 mr-2 text-blue-500 underline"
-              v-for="(code, index) in availableCode"
-              :key="index"
-              @click="getNewCode(availableCode[index])"
-              style="cursor: pointer"
-            >
-              {{ code }}</span
-            >
-          </div>
         </div>
         <div class="w-full my-2">
           <PriInputText
@@ -98,6 +78,11 @@
             >{{ $form.Email.error.message }}</PriMessage
           >
         </div>
+
+        <small class=""
+          >តើអ្នកធ្លាប់បានបង្កើតហាងហើយឬនៅ?
+          <router-link to="/login">ចូលទៅហាង</router-link></small
+        >
         <CustomButton
           type="submit"
           severity="primary"
@@ -120,7 +105,6 @@
       </Form>
     </div>
   </div>
-  <OtpForm :email="initialValues.Email" v-else @onBackClick="onBackClick()" />
 </template>
 
 <script setup>
@@ -130,14 +114,6 @@ import { z } from "zod";
 import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
 import OtpForm from "./OtpForm.vue";
-
-defineProps({
-  isShowBackBtn: {
-    type: Boolean,
-    default: () => true,
-  }
-});
-defineEmits(["onBackClick"]);
 const toast = useToast();
 const loading = ref(false);
 const isShowFormSignUp = ref(true);
@@ -191,8 +167,6 @@ const checkAvailableCode = async (event) => {
   const code = String(event.value);
   availableCode.value = [];
   initialValues.value.Code = event.value;
-  console.log(event.value && code.length === 4);
-  
   if (event.value && code.length === 4) {
     try {
       let codes = await $api.user.getAvailableCode({ CodeShop: Number(code) });
@@ -233,19 +207,19 @@ const onFormSubmit = async (e) => {
 </script>
 <style scoped>
 .login-form {
-  margin: auto;
+  /* margin: auto;
   width: 25%;
   box-shadow: #63636333 0px 2px 8px 0px;
   border-radius: 0.5rem;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
 }
-img {
+/* img {
   width: 70%;
   border-radius: 50%;
-}
+} */
 /* --- Smartphones (landscape) and Small Tablets (portrait) --- */
 /* (e.g., min-width of 576px) */
 @media (min-width: 360px) and (max-width: 768px) {

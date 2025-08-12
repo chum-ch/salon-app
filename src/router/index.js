@@ -2,15 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'home',
-    //   component: HomeView,
-    // },
     {
-      path: '/',
+      path: '/home',
       name: 'home',
       component: () => import('../views/HomeView.vue'),
+    },
+    {
+      path: '/',
+      name: 'login',
+      component: () => import('../components/form/UserLoginForm.vue'),
     },
     {
       path: '/about',
@@ -24,11 +24,6 @@ const router = createRouter({
       path: '/signup',
       name: 'signup',
       component: () => import('../components/form/SignUpForm.vue'),
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('../components/form/SignInForm.vue'),
     },
     {
       path: '/product',

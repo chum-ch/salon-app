@@ -1,9 +1,8 @@
 <script setup>
-import SignInForm from "../components/form/SignInForm.vue";
 </script>
 
 <template>
   <main>
-    <SignInForm />
+    My Home View
   </main>
 </template>
