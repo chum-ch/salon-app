@@ -4,40 +4,30 @@ import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
+import { useRouter } from "vue-router";
 import OtpForm from "./OtpForm.vue";
-defineProps({
+const props = defineProps({
   isShowBackBtn: {
     type: Boolean,
     default: () => true,
+  },
+  additionalData: {
+    type: Object,
+    default: () => ({}),
   },
 });
 defineEmits(["onBackClick"]);
 
 const $api = inject("$api");
-const refToChildCustomDialog = ref();
 const isShowOtpForm = ref(false);
+const route = useRouter();
+const additionalData = ref(props.additionalData);
+console.log("additionalData in forgotPwdForm", additionalData.value);
 const toast = useToast();
 const loading = ref(false);
 const initialValues = ref({
   ShopOwnerEmail: "",
-  ShopOwnerCode: "",
 });
-const resetCode = (event) => {
-  initialValues.value.ShopOwnerCode = event.value;
-}
-const createStudentInfo = async () => {
-  try {
-    // refToChildCustomDialog.value.openDialog();
-    let classes = await $api.user.listUsers();
-    console.log(classes);
-  } catch (error) {
-    console.log(error);
-  }
-};
-const closeDialogStudentForm = () => {
-  refToChildCustomDialog.value.closeDialog();
-};
-
 const resolver = zodResolver(
   z.object({
     ShopOwnerEmail: z
@@ -45,43 +35,39 @@ const resolver = zodResolver(
       .min(1, { message: "Email is required." })
       .email({ message: "Invalid email address." })
       .trim(),
-    ShopOwnerCode: z
-      .union([
-        z.string(),
-        z
-          .number()
-          .int({ message: "Code must be an integer." })
-          .min(1000, { message: "Code must be a 4-digit number." })
-          .max(9999, { message: "Code must be a 4-digit number." }),
-      ])
-      .nullable()
-      .refine((val) => val !== null, {
-        message: "Code is required.",
-      }),
   })
 );
 
 const onFormSubmit = (e) => {
   if (e.valid) {
-    console.log("ad", initialValues.value);
+    loading.value = true;
+    setTimeout( async() => {
+      try {
+        toast.add({
+          severity: "success",
+          summary: "Form is submitted.",
+          life: 3000,
+        });
+        const body = {
+          Email: initialValues.value.ShopOwnerEmail,
+        };
+        await $api.user.tenantSendEmail(additionalData.value.TenantId, body);
+  
+        loading.value = false;
+        isShowOtpForm.value = true;
+      } catch (error) {
+        loading.value = false;
+        console.error("Form forgot password error:", error);
+      }
+    }, 2000);
   }
 
-  loading.value = true;
-  setTimeout(() => {
-    toast.add({
-      severity: "success",
-      summary: "Form is submitted.",
-      life: 3000,
-    });
-    loading.value = false;
-    isShowOtpForm.value = true;
-  }, 2000);
 };
 </script>
 <template>
   <div class="forgot-pwd-form p-3" v-if="!isShowOtpForm">
     <i
-      v-if="isShowBackBtn"
+      v-if="props.isShowBackBtn"
       @click="($event) => $emit('onBackClick', $event)"
       class="pi pi-chevron-left text-blue-500 bg-blue-50 p-2 border-circle hover:bg-gray-200 cursor-pointer"
     ></i>
@@ -97,27 +83,7 @@ const onFormSubmit = (e) => {
       @submit="onFormSubmit"
     >
       <div class="w-full shop-owner-input">
-        <div class="w-full my-2">
-          <PriInputNumber
-            name="ShopOwnerCode"
-            type="text"
-            :useGrouping="false"
-            :min="0"
-            @input="resetCode"
-            placeholder="លេខកូដហាង"
-            fluid
-            v-model="initialValues.ShopOwnerCode"
-          />
-          <PriMessage
-            v-if="$form.ShopOwnerCode?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-            >{{ $form.ShopOwnerCode.error.message }}
-          </PriMessage>
-        </div>
-
-        <div class="w-full my-2">
+        <div class="w-full">
           <PriInputText
             name="ShopOwnerEmail"
             type="text"
@@ -143,9 +109,7 @@ const onFormSubmit = (e) => {
         :loading="loading"
         :disabled="
           !initialValues.ShopOwnerEmail ||
-          !initialValues.ShopOwnerCode ||
           $form.ShopOwnerEmail?.invalid ||
-          $form.ShopOwnerCode?.invalid ||
           loading
         "
       />
@@ -153,6 +117,8 @@ const onFormSubmit = (e) => {
   </div>
   <OtpForm v-else @onBackClick="isShowOtpForm = false"
     :email="initialValues.ShopOwnerEmail"
+    :additionalData="additionalData"
+    :isForgotPwd="true"
    />
 </template>
 

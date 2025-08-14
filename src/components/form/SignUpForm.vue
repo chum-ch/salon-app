@@ -1,6 +1,8 @@
 <template>
   <div class="login-form p-3" v-if="isShowFormSignUp">
-  <i v-if="isShowBackBtn" @click="$router.go(-1)"
+    <i
+      v-if="isShowBackBtn"
+      @click="$router.go(-1)"
       class="pi pi-chevron-left text-blue-500 bg-blue-50 p-2 border-circle hover:bg-gray-200 cursor-pointer"
     ></i>
     <div class="logo text-center">
@@ -120,7 +122,13 @@
       </Form>
     </div>
   </div>
-  <OtpForm :email="initialValues.Email" v-else @onBackClick="onBackClick()" />
+  <OtpForm
+    :email="initialValues.Email"
+    v-else
+    @onBackClick="onBackClick()"
+    :additionalData="initialValues"
+    :isForgotPwd="false"
+  />
 </template>
 
 <script setup>
@@ -135,7 +143,7 @@ defineProps({
   isShowBackBtn: {
     type: Boolean,
     default: () => true,
-  }
+  },
 });
 defineEmits(["onBackClick"]);
 const toast = useToast();
@@ -192,7 +200,7 @@ const checkAvailableCode = async (event) => {
   availableCode.value = [];
   initialValues.value.Code = event.value;
   console.log(event.value && code.length === 4);
-  
+
   if (event.value && code.length === 4) {
     try {
       let codes = await $api.user.getAvailableCode({ CodeShop: Number(code) });
@@ -203,31 +211,31 @@ const checkAvailableCode = async (event) => {
   }
 };
 const onFormSubmit = async (e) => {
-  try {
-    if (e.valid) {
-      loading.value = true;
-      const body = {
-        Name: initialValues.value.Name,
-        Code: Number(initialValues.value.Code),
-        Email: initialValues.value.Email,
-        Phone: initialValues.value.PhoneNumber,
-      };
-      console.log(body);
-
-      // await $api.user.tenantRegister(body);
-      setTimeout(() => {
+  if (e.valid) {
+    loading.value = true;
+    setTimeout(async () => {
+      try {
         toast.add({
           severity: "success",
           summary: "Form is submitted.",
           life: 3000,
         });
+        const body = {
+          Name: initialValues.value.Name,
+          Code: Number(initialValues.value.Code),
+          Email: initialValues.value.Email,
+          Phone: initialValues.value.PhoneNumber,
+        };
+
+        const { data: { EntityItemId } } = await $api.user.tenantRegister(body);
+        initialValues.value.TenantId = EntityItemId;
         loading.value = false;
         isShowFormSignUp.value = false;
-      }, 2000);
-    }
-  } catch (error) {
-    loading.value = false;
-    console.error(error);
+      } catch (error) {
+        loading.value = false;
+        console.error(error);
+      }
+    }, 2000);
   }
 };
 </script>

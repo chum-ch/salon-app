@@ -1,7 +1,7 @@
 <template>
     <div class="pwd-form p-3" v-if="!isShowPwdForm">
       <i
-        v-if="isShowBackBtn"
+        v-if="props.isShowBackBtn"
         @click="($event) => $emit('onBackClick', $event)"
         class="pi pi-chevron-left text-blue-500 bg-blue-50 p-2 border-circle hover:bg-gray-200 cursor-pointer"
       ></i>
@@ -23,6 +23,7 @@
               placeholder="Password"
               :feedback="false"
               toggleMask
+              autocomplete
               fluid
               v-model="initialValues.Password"
             />
@@ -62,7 +63,9 @@
         </Form>
       </div>
     </div>
-    <ForgotPwdForm v-else @onBackClick="isShowPwdForm = false" />
+    <ForgotPwdForm v-else @onBackClick="isShowPwdForm = false"
+      :additionalData="additionalData"
+     />
 </template>
 
 <script setup>
@@ -71,8 +74,9 @@ import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
+import { useRouter } from "vue-router";
 import ForgotPwdForm from "./ForgotPwdForm.vue";
-defineProps({
+const props = defineProps({
   isShowBackBtn: {
     type: Boolean,
     default: () => true,
@@ -86,9 +90,11 @@ defineEmits(["onBackClick"]);
 
 const $api = inject("$api");
 const toast = useToast();
+const route = useRouter();
 const loading = ref(false);
 const isShowPwdForm = ref(false);
-const additionalData = defineProps
+const additionalData = ref(props.additionalData);
+console.log("additionalData", additionalData.value);
 const initialValues = ref({
   Password: "",
 });
@@ -113,23 +119,31 @@ const resolver = zodResolver(
 );
 
 const onFormSubmit = (e) => {
-  try {
-    if (e.valid) {
-      console.log(initialValues.value);
-      console.log();
-      loading.value = true;
-      setTimeout(() => {
+  if (e.valid) {
+    loading.value = true;
+    setTimeout( async() => {
+      try {
         toast.add({
           severity: "success",
           summary: "Form is submitted.",
           life: 3000,
         });
+        const body = {
+          CodeShop: Number(additionalData.value.ShopOwnerCode),
+          FullName: additionalData.value.FullName,
+          Phone: additionalData.value.PhoneNumber,
+          Password: initialValues.value.Password,
+        }
+        await $api.user.ownerLogin(body);
         loading.value = false;
+        route.push('/home')
+
+      } catch (error) {
+        loading.value = false;
+        console.error("Form submission error:", error);
+      }
       }, 2000);
     }
-  } catch (error) {
-    console.error("Form submission error:", error);
-  }
 };
 </script>
 <style scoped>

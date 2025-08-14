@@ -1,7 +1,7 @@
 <template>
   <div class="pwd-form p-3" v-if="!isShowPwdForm">
     <i
-      v-if="isShowBackBtn"
+      v-if="props.isShowBackBtn"
       @click="($event) => $emit('onBackClick', $event)"
       class="pi pi-chevron-left text-blue-500 bg-blue-50 p-2 border-circle hover:bg-gray-200 cursor-pointer"
     ></i>
@@ -21,6 +21,7 @@
           <PriPassword
             name="NewPassword"
             placeholder="NewPassword"
+            autocomplete
             :feedback="false"
             toggleMask
             fluid
@@ -47,6 +48,7 @@
             name="ConfirmPassword"
             placeholder="ConfirmPassword"
             :feedback="false"
+            autocomplete
             toggleMask
             fluid
             v-model="initialValues.ConfirmPassword"
@@ -93,38 +95,36 @@ import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
+import { useRouter } from "vue-router";
 import ForgotPwdForm from "./ForgotPwdForm.vue";
-defineProps({
+import { Password } from "primevue";
+const props = defineProps({
   isShowBackBtn: {
     type: Boolean,
     default: () => true,
   },
+  additionalData: {
+    type: Object,
+    default: () => ({}),
+  },
+  isForgotPwd: {
+    type: Boolean,
+  },
+
 });
 defineEmits(["onBackClick"]);
 
 const $api = inject("$api");
-
+const route = useRouter();
 const toast = useToast();
 const loading = ref(false);
 const isShowPwdForm = ref(false);
+const additionalData = ref(props.additionalData);
+console.log("additionalData in resetPwdForm", additionalData.value);
 const initialValues = ref({
   NewPassword: "",
   ConfirmPassword: "",
 });
-const refToChildCustomDialog = ref();
-const createStudentInfo = async () => {
-  try {
-    // refToChildCustomDialog.value.openDialog();
-    let classes = await $api.user.listUsers();
-    console.log(classes);
-  } catch (error) {
-    console.log(error);
-  }
-};
-const closeDialogStudentForm = () => {
-  refToChildCustomDialog.value.closeDialog();
-};
-
 const resolver = zodResolver(
   z.object({
     NewPassword: z
@@ -161,21 +161,39 @@ const resolver = zodResolver(
 );
 
 const onFormSubmit = (e) => {
-  try {
-    if (e.valid) {
-      console.log(initialValues.value);
-      loading.value = true;
-      setTimeout(() => {
+  if (e.valid) {
+    console.log(initialValues.value);
+    loading.value = true;
+    setTimeout(async () => {
+      try {
         toast.add({
           severity: "success",
           summary: "Form is submitted.",
           life: 3000,
         });
+        const body = {
+          Code: Number(additionalData.value.ShopOwnerCode),
+          Email: additionalData.value.Email,
+          Password: initialValues.value.NewPassword,
+          OtpCode: Number(additionalData.value.OtpCode),
+          ConfirmPassword: initialValues.value.ConfirmPassword,
+        };
+        if (props.isForgotPwd) {
+          await $api.user.forgotPassword(additionalData.value.TenantId, body);
+        } else {
+          const bodySetPwd = {
+            Password: initialValues.value.NewPassword,
+            ConfirmPassword: initialValues.value.ConfirmPassword,
+          }
+          await $api.user.setPassword(additionalData.value.TenantId, bodySetPwd);
+        }
+        route.push("/home");
         loading.value = false;
-      }, 2000);
-    }
-  } catch (error) {
-    console.error("Form submission error:", error);
+      } catch (error) {
+        loading.value = false;
+        console.error("Form submission error:", error);
+      }
+    }, 2000);
   }
 };
 </script>

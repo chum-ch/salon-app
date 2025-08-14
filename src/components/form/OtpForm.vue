@@ -1,65 +1,62 @@
 <script setup>
 import { ref, inject } from "vue";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
-import { boolean, z } from "zod";
+import { z } from "zod";
 import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
+import { useRouter } from "vue-router";
+import ResetPwdForm from "./ResetPwdForm.vue";
+
 const $api = inject("$api");
 
-defineProps({
+const props = defineProps({
   isShowBackBtn: {
     type: Boolean,
     default: () => true,
   },
   email: {
-    type: String
+    type: String,
+  },
+  additionalData: {
+    type: Object,
+    default: () => ({}),
   },
 });
-
-const refToChildCustomDialog = ref();
+const route = useRouter();
 const toast = useToast();
 const loading = ref(false);
+const isShowResetPwdForm = ref(false);
 const initialValues = ref({
   Passcode: "",
 });
+const additionalData = ref(props.additionalData);
+console.log("additionalData in otpForm", additionalData.value);
 const isShowSpinner = ref(false);
 const isSuccess = ref(false);
 const isError = ref(false);
 
-// const createStudentInfo = async () => {
-//   try {
-//     // refToChildCustomDialog.value.openDialog();
-//     let classes = await $api.user.listUsers();
-//     console.log(classes);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-// const closeDialogStudentForm = () => {
-//   refToChildCustomDialog.value.closeDialog();
-// };
-const resendOTP = async (email) => {
-  try {
-    isShowSpinner.value = true;
-    // await $api.user.resendOTP("Tenant:c02fac22e33441dea44ac78851e96a45", {
-    //   Email: email,
-    // });
-    console.log('Rsend to', email);
-    
-    setTimeout(() => {
+const resendOTP = (email) => {
+  isShowSpinner.value = true;
+  setTimeout(async () => {
+    try {
       toast.add({
         severity: "success",
         summary: "Form is submitted.",
         life: 3000,
       });
+
+      await $api.user.resendOTP(additionalData.value.TenantId, {
+        Email: email,
+      });
+
       isShowSpinner.value = false;
       isSuccess.value = true;
-    }, 2000);
-  } catch (error) {
-    console.error(error);
-    isShowSpinner.value = false;
-    isError.value = true;
-  }
+    } catch (error) {
+      console.error("Resend OTP error:", error);
+      isShowSpinner.value = false;
+      isError.value = true;
+    }
+  }, 2000);
 };
 
 const resolver = zodResolver(
@@ -68,37 +65,39 @@ const resolver = zodResolver(
   })
 );
 
-const onFormSubmit = async (e) => {
-  try {
-    if (e.valid) {
-      loading.value = true;
-      const body = { OTP: Number(initialValues.value.Passcode) };
-      console.log(body);
-
-      // let otp = await $api.user.sendOTP(
-      //   "Tenant:c02fac22e33441dea44ac78851e96a45",
-      //   body
-      // );
-      setTimeout(() => {
+const onFormSubmit = (e) => {
+  if (e.valid) {
+    loading.value = true;
+    setTimeout(async () => {
+      try {
         toast.add({
           severity: "success",
           summary: "Form is submitted.",
           life: 3000,
         });
+        const body = { OTP: Number(initialValues.value.Passcode) };
+        await $api.user.sendOTP(additionalData.value.TenantId, body);
         loading.value = false;
-      }, 2000);
-    }
-  } catch (error) {
-    loading.value = false;
-    console.log(error);
+        isShowResetPwdForm.value = true;
+        additionalData.value.Email = props.email;
+        additionalData.value.OtpCode = initialValues.value.Passcode;
+      } catch (error) {
+        loading.value = false;
+        console.error("Form otp error:", error);
+      }
+    }, 2000);
   }
 };
 defineEmits(["onBackClick"]);
 </script>
 
 <template>
-  <div class="otp-form p-3">
-    <i v-if="isShowBackBtn" @click="($event) => $emit('onBackClick', $event)"
+  <div class="otp-form p-3"
+    v-if="!isShowResetPwdForm"
+  >
+    <i
+      v-if="props.isShowBackBtn"
+      @click="($event) => $emit('onBackClick', $event)"
       class="pi pi-chevron-left text-blue-500 bg-blue-50 p-2 border-circle hover:bg-gray-200 cursor-pointer"
     ></i>
     <div class="logo text-center">
@@ -119,11 +118,12 @@ defineEmits(["onBackClick"]);
         :resolver="resolver"
         class="flex flex-wrap w-full"
         @submit="onFormSubmit"
+        autocomplete="off"
       >
         <div class="w-full">
+            <!-- mask -->
           <PriInputOtp
             name="Passcode"
-            mask
             integerOnly
             v-model="initialValues.Passcode"
             :length="6"
@@ -171,6 +171,9 @@ defineEmits(["onBackClick"]);
       </Form>
     </div>
   </div>
+  <ResetPwdForm v-else @onBackClick="isShowResetPwdForm = false"
+    :additionalData="additionalData"
+  />
 </template>
 
 <style scoped>

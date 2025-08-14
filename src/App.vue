@@ -72,13 +72,14 @@ const openMenu = () => {
             <p>Products</p>
           </router-link>
         </div> -->
-        <!-- <div clss="relative">
+        <div clss="relative">
           <PriButton
             type="button"
-            icon="pi pi-shopping-cart"
-            badge="10"
+            label="ការចុះឈ្មោះ"
+            class="p-0 px-2"
+            @click="route.push('/signup')"
           />
-        </div> -->
+        </div>
       </div>
     </div>
     <CustomMenu ref="refToFunMenu" />

@@ -92,8 +92,9 @@
     </div>
   </div>
   <PasswordForm
-    v-else-if="isShowPwdForm"
+    v-else
     @onBackClick="isShowPwdForm = false"
+    :additionalData="initialValues"
   />
 </template>
 
@@ -117,7 +118,7 @@ const isShowPwdForm = ref(false);
 const initialValues = ref({
   ShopOwnerCode: "",
   FullName: "",
-  PhoneNumber: ""
+  PhoneNumber: "",
 });
 
 const resolver = zodResolver(
@@ -147,49 +148,43 @@ const resolver = zodResolver(
   })
 );
 
-const checkOwnerLogin = (event) => {
-  console.log(event);
-  
-}
 const onFormSubmit = async (e) => {
-  try {
-    if (e.valid) {
-      loading.value = true;
-      const body = {
-        CodeShop: Number(initialValues.value.ShopOwnerCode),
-        FullName: initialValues.value.FullName,
-        Phone: initialValues.value.PhoneNumber
-      };
-      console.log(body);
-      
-      setTimeout( async() => {
+  if (e.valid) {
+    loading.value = true;
+    setTimeout(async () => {
+      try {
         toast.add({
           severity: "success",
           summary: "Form is submitted.",
           life: 3000,
         });
-        loading.value = false;
-
-        let login = await $api.user.userLogin(body);
-        console.log(login.data);
         
+        const body = {
+          CodeShop: Number(initialValues.value.ShopOwnerCode),
+          FullName: initialValues.value.FullName,
+          Phone: initialValues.value.PhoneNumber,
+        };
+        let login = await $api.user.userLogin(body);
+        loading.value = false;
+        // Passed TenantId to ForgotPwdForm
+        initialValues.value.TenantId = login.data.TenantId;
+
         const { UserType } = login.data;
         switch (UserType) {
           case constanceVariable.UserType.Guest:
-            route.push('/home')
+            route.push("/home");
             break;
           case constanceVariable.UserType.Owner:
             isShowPwdForm.value = true;
             break;
-        
           default:
             break;
         }
-      }, 2000);
-    }
-  } catch (error) {
-    loading.value = false;
-    console.log(error);
+      } catch (error) {
+        loading.value = false;
+        console.error("Form user login error:", error);
+      }
+    }, 2000);
   }
 };
 </script>
