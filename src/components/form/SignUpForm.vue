@@ -142,7 +142,7 @@ import OtpForm from "./OtpForm.vue";
 defineProps({
   isShowBackBtn: {
     type: Boolean,
-    default: () => true,
+    default: () => false,
   },
 });
 defineEmits(["onBackClick"]);

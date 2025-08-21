@@ -8,8 +8,14 @@
     >
       <template #header>
         <div class="relative mx-auto">
-          <img src="../../assets/p1.jpeg" alt="img" class="w-full rounded" />
+          <img
+            src="/imgs/placeholder-image.png"
+            alt="img"
+            width="100"
+            class="w-full rounded"
+          />
           <PriTag
+            v-if="item.Price.Discount"
             :value="`${item.Price.Discount}% OFF`"
             severity="success"
             class="absolute top-0 right-0"
@@ -17,9 +23,18 @@
         </div>
       </template>
       <template #title> {{ item.Title }} </template>
-      <!-- <template #subtitle>{{ item.Subtitle }}</template> -->
+      <template #subtitle>
+        <span class="discount-value flex">
+          <i
+            class="pi pi-clock mr-1 mt-1 text-primary"
+            style="font-size: 1rem;"
+          >
+          </i>
+          <span class="amount">30 mins</span>
+        </span>
+      </template>
       <template #content>
-        <p class="m-0 text-justify">
+        <p class="truncate-text overflow-scroll m-0 text-justify" style="height: 50px;">
           {{ item.Content }}
         </p>
       </template>
@@ -30,14 +45,16 @@
               {{ item.Price.Currency === "USD" ? "$" : "៛" }}
               {{ calculatePriceAfterDiscount(item.Price) }}
             </h2>
-            <del class="mt-0 original-price mx-1 text-red-500">
+            <del 
+              v-if="item.Price.Discount"
+             class="mt-0 original-price mx-1 text-red-500">
               {{ item.Price.Currency === "USD" ? "$" : "៛" }}
               {{ item.Price.Original }}</del
             >
           </div>
-          <span>
-            <PriButton icon="pi pi-shopping-cart" class="ml-2" />
-          </span>
+          <PriButton class="p-0 px-2 m-0"
+            :label="'កក់ឥឡូវ'"
+           />
         </div>
       </template>
     </PriCard>
@@ -51,11 +68,11 @@ const items = [
     Image: "../../assets/p1.jpeg",
     Title: "Advanced Card",
     Subtitle: "Card subtitle",
-    Content: "Lorem ipsum dolor sit amet, ",
+    Content: "ម៉ូដសក់កំពុងពេញនិយម",
     Price: {
       Currency: "USD",
       Original: 20,
-      Discount: 12,
+      Discount: 5,
     },
   },
 
@@ -95,7 +112,7 @@ const items = [
 ];
 const calculatePriceAfterDiscount = (priceObject) => {
   const originalPrice = priceObject.Original;
-  const discountPercentage = priceObject.Discount; // Assuming this is a percentage
+  const discountPercentage = priceObject.Discount || 0; // Assuming this is a percentage
 
   if (
     typeof originalPrice !== "number" ||
@@ -119,15 +136,30 @@ const calculatePriceAfterDiscount = (priceObject) => {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  
 }
 .card {
   box-shadow: #63636333 0px 2px 8px 0px;
   background: transparent;
   border-radius: 0.5rem;
-  width: 25%;
+  width: 20%;
   margin: 1rem;
 }
-
+.btn {
+  width: 50%;
+  /* border-radius: 10px; */
+  /* background: #fff9e5; */
+  /* color: #f98600; */
+}
+.truncate-text {
+    /* overflow: scroll; */
+    /* display: -webkit-box; */
+    /* -webkit-box-orient: vertical; */
+    /* The number of lines to show before truncating */
+    /* -webkit-line-clamp: 4;  */
+    /* white-space: nowrap; */
+    /* text-overflow: ellipsis; */
+  }
 /* --- Smartphones (landscape) and Small Tablets (portrait) --- */
 /* (e.g., min-width of 576px) */
 @media (min-width: 360px) and (max-width: 768px) {

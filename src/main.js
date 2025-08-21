@@ -52,7 +52,7 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-axios.defaults.baseURL = "http://localhost:3000";
+// axios.defaults.baseURL = "http://localhost:3000";
 // axios.defaults.baseURL = 'https://svc-sms.onrender.com'
 // axios.defaults.baseURL = 'https://chum-api.onrender.com'
 // if (import.meta.env.PROD) {
