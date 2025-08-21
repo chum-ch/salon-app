@@ -8,17 +8,19 @@
     >
       <template #header>
         <div class="relative mx-auto">
+
+          <PriTag
+            v-if="item.Price.Discount"
+            :value="`${item.Price.Discount}% OFF`"
+            severity="success"
+            class="absolute top-0 left-0"
+            style="color: #f98600; background: #fff9e5;"
+          />
           <img
             src="/imgs/placeholder-image.png"
             alt="img"
             width="100"
             class="w-full rounded"
-          />
-          <PriTag
-            v-if="item.Price.Discount"
-            :value="`${item.Price.Discount}% OFF`"
-            severity="success"
-            class="absolute top-0 right-0"
           />
         </div>
       </template>
@@ -26,8 +28,8 @@
       <template #subtitle>
         <span class="discount-value flex">
           <i
-            class="pi pi-clock mr-1 mt-1 text-primary"
-            style="font-size: 1rem;"
+            class="pi pi-clock mr-1 mt-1"
+            style="font-size: 1rem; color: #f98600"
           >
           </i>
           <span class="amount">30 mins</span>
