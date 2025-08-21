@@ -30,7 +30,7 @@ const initialValues = ref({
   Passcode: "",
 });
 const additionalData = ref(props.additionalData);
-console.log("additionalData in otpForm", additionalData.value);
+// console.log("additionalData in otpForm", additionalData.value);
 const isShowSpinner = ref(false);
 const isSuccess = ref(false);
 const isError = ref(false);

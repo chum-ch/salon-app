@@ -94,7 +94,7 @@ const route = useRouter();
 const loading = ref(false);
 const isShowPwdForm = ref(false);
 const additionalData = ref(props.additionalData);
-console.log("additionalData", additionalData.value);
+// console.log("additionalData", additionalData.value);
 const initialValues = ref({
   Password: "",
 });

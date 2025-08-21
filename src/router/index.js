@@ -30,6 +30,11 @@ const router = createRouter({
       name: 'product',
       component: () => import('../components/customs/CustomCard.vue'),
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('../views/404View.vue'),
+    }
   ],
 })
 

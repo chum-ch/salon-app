@@ -80,21 +80,6 @@ import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
 const $api = inject("$api");
 const refToChildCustomDialog = ref();
-const createStudentInfo = async () => {
-  try {
-    // refToChildCustomDialog.value.openDialog();
-  let classes = await $api.user.listUsers();
-    console.log(classes);
-    
-  } catch (error) {
-    console.log(error);
-    
-  }
-
-};
-const closeDialogStudentForm = () => {
-  refToChildCustomDialog.value.closeDialog();
-};
 
 const toast = useToast();
 const loading = ref(false);
@@ -129,11 +114,6 @@ const resolver = zodResolver(
 );
 
 const onFormSubmit = (e) => {
-  
-  if (e.valid) {
-    console.log("ad");
-  }
-
   loading.value = true;
   setTimeout(() => {
      toast.add({

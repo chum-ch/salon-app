@@ -120,7 +120,7 @@ const toast = useToast();
 const loading = ref(false);
 const isShowPwdForm = ref(false);
 const additionalData = ref(props.additionalData);
-console.log("additionalData in resetPwdForm", additionalData.value);
+// console.log("additionalData in resetPwdForm", additionalData.value);
 const initialValues = ref({
   NewPassword: "",
   ConfirmPassword: "",
@@ -162,7 +162,6 @@ const resolver = zodResolver(
 
 const onFormSubmit = (e) => {
   if (e.valid) {
-    console.log(initialValues.value);
     loading.value = true;
     setTimeout(async () => {
       try {

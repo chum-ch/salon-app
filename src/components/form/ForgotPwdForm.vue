@@ -22,7 +22,7 @@ const $api = inject("$api");
 const isShowOtpForm = ref(false);
 const route = useRouter();
 const additionalData = ref(props.additionalData);
-console.log("additionalData in forgotPwdForm", additionalData.value);
+// console.log("additionalData in forgotPwdForm", additionalData.value);
 const toast = useToast();
 const loading = ref(false);
 const initialValues = ref({

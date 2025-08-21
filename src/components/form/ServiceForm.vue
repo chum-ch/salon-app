@@ -172,7 +172,7 @@ const checkAvailableCode = async (event) => {
       let codes = await $api.user.getAvailableCode({ CodeShop: Number(code) });
       availableCode.value = codes.data;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 };
@@ -186,9 +186,7 @@ const onFormSubmit = async (e) => {
         Email: initialValues.value.Email,
         Phone: initialValues.value.PhoneNumber,
       };
-      console.log(body);
-
-      // await $api.user.tenantRegister(body);
+      await $api.user.tenantRegister(body);
       setTimeout(() => {
         toast.add({
           severity: "success",
