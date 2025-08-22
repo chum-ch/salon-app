@@ -23,6 +23,10 @@
           <p>Products
           </p>
         </router-link>
+        <router-link to="/product" @click="visible = false">
+          <p>Products
+          </p>
+        </router-link>
       </div>
       <template #footer>
         <div class="w-min">
@@ -57,8 +61,7 @@ defineExpose({ closeMenu, openMenu });
   margin: 0;
   padding: 0;
 }
-.menu p {
-  color: var(--vt-c-black);
+ .menu p {
   padding: 0.5rem;
   margin-top: 0.5rem;
   list-style: none;

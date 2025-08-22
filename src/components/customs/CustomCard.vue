@@ -163,14 +163,25 @@ const calculatePriceAfterDiscount = (priceObject) => {
     /* text-overflow: ellipsis; */
   }
 /* --- Smartphones (landscape) and Small Tablets (portrait) --- */
-/* (e.g., min-width of 576px) */
-@media (min-width: 360px) and (max-width: 768px) {
+@media (max-width: 768px) {
   /* .card-container {
-    justify-Content: centerP
+    justify-Content: center
   } */
   .card {
     margin: 1rem 0px 0px 0px;
     width: 80%;
+  }
+}
+
+/* --- Tablets (landscape) and Laptops --- */
+/* (e.g., min-width of 768px) */
+@media (min-width: 768px) and (max-width: 992px) {
+  .card-container {
+    justify-content: space-evenly;
+  }
+  .card {
+    margin: 1rem 0px 0px 0px;
+    width: 40%;
   }
 }
 </style>

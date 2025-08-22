@@ -254,9 +254,17 @@ img {
 }
 /* --- Smartphones (landscape) and Small Tablets (portrait) --- */
 /* (e.g., min-width of 576px) */
-@media (min-width: 360px) and (max-width: 768px) {
+@media (max-width: 768px) {
   .login-form {
     width: 90%;
+  }
+}
+
+/* --- Tablets (landscape) and Laptops --- */
+/* (e.g., min-width of 768px) */
+@media (min-width: 768px) and (max-width: 992px) {
+  .login-form {
+    width: 50%;
   }
 }
 </style>
