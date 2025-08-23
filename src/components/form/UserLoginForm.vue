@@ -33,6 +33,24 @@
             </PriMessage>
           </div>
 
+
+          <div class="w-full my-2">
+            <PriInputText
+              name="PhoneNumber"
+              type="text"
+              placeholder="លេខទូរស័ព្ទរបស់អ្នក"
+              fluid
+              v-model="initialValues.PhoneNumber"
+            />
+            <PriMessage
+              v-if="$form.PhoneNumber?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              >{{ $form.PhoneNumber.error.message }}
+            </PriMessage>
+          </div>
+
           <div class="w-full my-2">
             <PriInputText
               name="FullName"
@@ -47,22 +65,6 @@
               size="small"
               variant="simple"
               >{{ $form.FullName.error.message }}
-            </PriMessage>
-          </div>
-          <div class="w-full my-2">
-            <PriInputText
-              name="PhoneNumber"
-              type="text"
-              placeholder="លេខទូរស័ព្ទ"
-              fluid
-              v-model="initialValues.PhoneNumber"
-            />
-            <PriMessage
-              v-if="$form.PhoneNumber?.invalid"
-              severity="error"
-              size="small"
-              variant="simple"
-              >{{ $form.PhoneNumber.error.message }}
             </PriMessage>
           </div>
         </div>

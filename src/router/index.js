@@ -26,9 +26,9 @@ const router = createRouter({
       component: () => import('../components/form/SignUpForm.vue'),
     },
     {
-      path: '/product',
-      name: 'product',
-      component: () => import('../components/customs/CustomCard.vue'),
+      path: '/calendar',
+      name: 'calendar',
+      component: () => import('../components/customs/CustomFullCalender.vue'),
     },
     {
       path: '/:pathMatch(.*)*',

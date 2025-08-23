@@ -32,6 +32,8 @@ import RadioButtonGroup from 'primevue/radiobuttongroup';
 import InputOtp from 'primevue/inputotp';
 import Checkbox from 'primevue/checkbox';
 import CheckboxGroup from 'primevue/checkboxgroup';
+import Tooltip from 'primevue/tooltip';
+import DatePicker from 'primevue/datepicker';
 
 // My Customs
 import CustomButton from "./components/customs/CustomButton.vue";
@@ -39,6 +41,7 @@ import CustomDialog from "./components/customs/CustomDialog.vue";
 import CustomCard from "./components/customs/CustomCard.vue";
 import CustomMenu from "./components/customs/CustomMenu.vue";
 import CustomDropdown from "./components/customs/CustomDropdown.vue";
+import CustomFullCalender from "./components/customs/CustomFullCalender.vue";
 const pinia = createPinia()
 const app = createApp(App)
 
@@ -86,12 +89,15 @@ app.component('PriRadioButtonGroup', RadioButtonGroup);
 app.component('PriInputOtp', InputOtp);
 app.component('PriCheckbox', Checkbox);
 app.component('PriCheckboxGroup', CheckboxGroup);
+app.component('PriDatePicker', DatePicker);
 // Customs
 app.component("CustomButton", CustomButton);
 app.component("CustomDialog", CustomDialog);
 app.component("CustomCard", CustomCard);
 app.component("CustomMenu", CustomMenu);
 app.component("CustomDropdown", CustomDropdown);
+app.component("CustomFullCalender", CustomFullCalender);
+app.directive('tooltip', Tooltip);
 app.provide("$api", API(axios));
 app.provide("$constanceVariable", ConstanceVariable);
 app.provide("$helperFun", HelperFun);

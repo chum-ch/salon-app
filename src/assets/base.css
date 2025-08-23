@@ -62,7 +62,7 @@
 body {
   min-height: 100vh;
   /* background: #fff; */
-  /* background: #11c290; */
+  /* background: var(--vt-c-indigo); */
   /* opacity: 0.3; */
   /* background: linear-gradient(132deg, #498BDC 30.02%, #00CADE 93.38%); */
   background: linear-gradient(180deg, #11c290a8 0%, #ffffff 100%);

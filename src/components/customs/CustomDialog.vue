@@ -23,7 +23,7 @@ const openDialog = () => {
 const closeDialog = () => {
   displayModal.value = false;
 };
-defineEmits(["onClickDialogSubmit", "onClickCloseDialog"]);
+defineEmits(["onClickDialogSubmit", "onClickCloseDialog", "update:visible"]);
 defineExpose({ openDialog, closeDialog });
 // Variables
 const displayModal = ref(false);
@@ -39,6 +39,7 @@ const position = ref("top");
       :style="{ width: dialogWidth ? dialogWidth : '45vw' }"
       :modal="true"
       :breakpoints="{ '960px': '75vw', '641px': '92vw' }"
+      @update:visible="$emit('update:visible', displayModal)"
     >
       <div class="text-center" v-if="isDelete">
         <span class="mr-1 font-bold">Delete</span>

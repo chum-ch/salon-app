@@ -19,12 +19,12 @@
         class="mb-4 border-t border-0 border-surface-200"
       />
       <div class="menu">
-        <router-link to="/product" @click="visible = false">
-          <p>Products
+        <router-link to="/home" @click="visible = false">
+          <p>Services
           </p>
         </router-link>
-        <router-link to="/product" @click="visible = false">
-          <p>Products
+        <router-link to="/calendar" @click="visible = false">
+          <p>Calendars
           </p>
         </router-link>
       </div>
