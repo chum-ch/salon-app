@@ -1,5 +1,5 @@
-const userApi = "https://95ipr7p9sa.execute-api.ap-southeast-1.amazonaws.com/dev";
-// const userApi = "http://localhost:3000";
+// const userApi = "https://95ipr7p9sa.execute-api.ap-southeast-1.amazonaws.com/dev";
+const userApi = "http://localhost:3000";
 export default (axios)=>({
     tenantRegister(data){
         return axios.post(`${userApi}/tenants/register`, data)

@@ -68,7 +68,7 @@ const openMenu = () => {
           @click="openMenu"
           v-if="$route.path !=='/' && $route.path !=='/signup'"
         />
-        <div class="register absolute right-0 top-0 p-2"
+        <div class="register"
           v-else
         >
           <PriButton
@@ -106,10 +106,11 @@ h3 {
   color: #fff;
 }
 .container-menu {
-  /* background: #000; */
   /* display: flex;
-  justify-content: space-between;
-  padding: 0.3rem; */
+  justify-content: space-between; */
+  padding: 0.3rem; 
+  backdrop-filter: blur(10px);
+  background-color: #11c29000; /* Optional: Adds a translucent color to enhance the effect */
 }
 .menu {
   display: flex;
