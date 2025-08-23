@@ -102,12 +102,15 @@
 import { ref, inject } from "vue";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { z } from "zod";
+import { useRouter } from "vue-router";
 import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
 import PasswordForm from "./PasswordForm.vue";
-import constanceVariable from "@/helper/constanceVariable";
-import { useRouter } from "vue-router";
+
 const $api = inject("$api");
+const $constanceVariable = inject("$constanceVariable");
+const $helperFun = inject("$helperFun");
+
 const route = useRouter();
 const resetCode = (event) => {
   initialValues.value.ShopOwnerCode = event.value;
@@ -170,11 +173,12 @@ const onFormSubmit = async (e) => {
         initialValues.value.TenantId = login.data.TenantId;
 
         const { UserType } = login.data;
+        $helperFun.setSessionItem($constanceVariable.SessionStorageKey.UserInfo, login.data);
         switch (UserType) {
-          case constanceVariable.UserType.Guest:
+          case $constanceVariable.UserType.Guest:
             route.push("/home");
             break;
-          case constanceVariable.UserType.Owner:
+          case $constanceVariable.UserType.Owner:
             isShowPwdForm.value = true;
             break;
           default:

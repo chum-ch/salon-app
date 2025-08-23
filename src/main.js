@@ -3,9 +3,14 @@ import '/node_modules/primeflex/primeflex.css'
 import 'primeicons/primeicons.css'
 import axios from "axios";
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config';
 import App from './App.vue'
 import API from "./api/api";
+import ConstanceVariable from "@/helpers/constanceVariable";
+import HelperFun from "@/helpers/helperFun";
+import Store from "@/stores/store";
+
 import router from './router'
 import Aura from '@primeuix/themes/aura';
 import ToastService from 'primevue/toastservice';
@@ -34,6 +39,7 @@ import CustomDialog from "./components/customs/CustomDialog.vue";
 import CustomCard from "./components/customs/CustomCard.vue";
 import CustomMenu from "./components/customs/CustomMenu.vue";
 import CustomDropdown from "./components/customs/CustomDropdown.vue";
+const pinia = createPinia()
 const app = createApp(App)
 
 // Config Axios
@@ -87,6 +93,9 @@ app.component("CustomCard", CustomCard);
 app.component("CustomMenu", CustomMenu);
 app.component("CustomDropdown", CustomDropdown);
 app.provide("$api", API(axios));
+app.provide("$constanceVariable", ConstanceVariable);
+app.provide("$helperFun", HelperFun);
+app.provide("$store", Store);
 app.use(PrimeVue, {
     theme: {
         preset: Aura
@@ -95,4 +104,5 @@ app.use(PrimeVue, {
 
 app.use(router)
 app.use(ToastService);
+app.use(pinia)
 app.mount('#app')

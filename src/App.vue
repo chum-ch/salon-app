@@ -66,13 +66,11 @@ const openMenu = () => {
           class="bg-transparent icon-bars"
           icon="pi pi-bars"
           @click="openMenu"
+          v-if="$route.path !=='/' && $route.path !=='/signup'"
         />
-        <!-- <div class="menu">
-          <router-link to="/product">
-            <p>Products</p>
-          </router-link>
-        </div> -->
-        <div clss="relative">
+        <div class="register absolute right-0 top-0 p-2"
+          v-else
+        >
           <PriButton
             type="button"
             label="ការចុះឈ្មោះ"
@@ -108,10 +106,10 @@ h3 {
   color: #fff;
 }
 .container-menu {
-  background: #000;
-  display: flex;
+  /* background: #000; */
+  /* display: flex;
   justify-content: space-between;
-  padding: 0.3rem;
+  padding: 0.3rem; */
 }
 .menu {
   display: flex;

@@ -12,7 +12,7 @@
             shape="circle"
           /> -->
           <!-- <img src="../../../public/imgs/salon.png" alt="logo" width="50" /> -->
-          <span class="font-bold mt-2 text-center">អ៊ែលលី~Ellie Salon</span>
+          <span class="font-bold mt-2 text-center">{{ userInfo?.FullName ? userInfo.FullName : 'អ៊ែលលី~Ellie Salon' }}</span>
         </div>
       </template>
       <hr
@@ -36,7 +36,7 @@
             class="flex-auto"
             :danger="true"
             :outlined="true"
-            @click="visible = false"
+            @click="userLogout"
           />
         </div>
       </template>
@@ -45,7 +45,13 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, inject, onUpdated } from "vue";
+import { useRouter } from "vue-router";
+
+onUpdated(() => {
+  // console.log('onBeforeUpdate: The component is about to re-render.');
+  userInfo.value = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.UserInfo);
+});
 
 const visible = ref(false);
 const openMenu = () => {
@@ -55,6 +61,16 @@ const closeMenu = () => {
   visible.value = false;
 };
 defineExpose({ closeMenu, openMenu });
+const userLogout = () => {
+  $helperFun.clearSession();
+  visible.value = false;
+  route.push("/");
+};
+// Variables
+const $constanceVariable = inject("$constanceVariable");
+const $helperFun = inject("$helperFun");
+const route = useRouter();
+const userInfo = ref({});
 </script>
 <style scoped>
 * {
