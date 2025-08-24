@@ -163,7 +163,7 @@ const resolver = zodResolver(
   })
 );
 
-const calendarOptions = reactive({
+const calendarOptions = ref({
   plugins: [
     dayGridPlugin,
     interactionPlugin,
@@ -207,19 +207,20 @@ const calendarOptions = reactive({
   // Events
   // Get calendar event form parent
   // eventClick: this.editEventCalendar,
-  // eventDidMount: function (info) {
-  //   const teacher = info.event.extendedProps.teacherName
-  //   const roomName = info.event.extendedProps.roomName
-  //   const courseName = info.event.extendedProps.courseName
-  //   info.el.querySelector('.fc-event-title').innerHTML +=
-  //     `
-  //     <div class="grid-container">
-  //       <div class="grid-item">${courseName}</div>
-  //       <div class="grid-item">${teacher}</div>
-  //       <div class="grid-item">${roomName}</div>
-  //     </div>
-  //     `
-  // },
+  eventDidMount: function (info) {
+    const guestName = info.event.extendedProps.GuestName || ''
+    const ph = info.event.extendedProps.PhoneNumber || ''
+    const title = info.event.title || ''
+    
+    info.el.querySelector('.fc-event-title').innerHTML =
+      `
+      <div class="event-title text-center font-bold text-primary">${info.event.title}</div>
+      <div class="grid-container">
+        <div class="grid-item">${guestName}</div>
+        <div class="grid-item">${ph}</div>
+      </div>
+      `
+  },
   events: [
     {
       title: "",
@@ -227,8 +228,8 @@ const calendarOptions = reactive({
       end: "",
       extendedProps: {
         // className: '',
-        teacherName: "",
-        roomName: "",
+        GuestName: "",
+        PhoneNumber: "",
       },
     },
     {
@@ -375,6 +376,37 @@ const closeDialogEvent = () => {
 const getSelectOptionChange = () => {
   handleEndDateTime(endDate.value);
 }
+
+
+const loadBookingsFromSessionStorage = async () => {
+  const bookings = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.AllBookingsItems);
+  if (bookings) {
+    calendarOptions.value.events = bookings;
+  }
+};
+const listBookings = async () => {
+  try {
+    const bookings = await $api.salon.listBookings(userInfo.TenantId, userInfo.EntityItemId);
+    if (bookings.data) {
+      const events = bookings.data.map((item) => ({
+        title: item.Service.Name,
+        start: item.StartDateTime,
+        end: item.EndDateTime,
+        extendedProps: {
+          GuestName: item.User.FullName,
+          PhoneNumber: item.User.Phone,
+        }
+      }));
+      
+      $helperFun.setSessionItem($constanceVariable.SessionStorageKey.AllBookingsItems, events);
+      loadBookingsFromSessionStorage();
+    }
+    
+  } catch (error) {
+    console.error("List bookings error:", error);
+  }
+}
+
 const submitEvent = (e) => {
   if (e.valid) {
     loading.value = true;
@@ -394,7 +426,8 @@ const submitEvent = (e) => {
         }
         await $api.salon.createBooking(userInfo.TenantId, userInfo.EntityItemId, body);
         loading.value = false;
-        // closeDialogEvent();
+        await listBookings();
+        closeDialogEvent();
       } catch (error) {
         loading.value = false;
         console.error("Form create event error:", error);
@@ -403,7 +436,8 @@ const submitEvent = (e) => {
   }
   
 };
-onMounted(() => {
+onMounted( async() => {
+  await listBookings();
   const calendarEl = calendarRef.value.$el;
   calendarEl.addEventListener("mousedown", handleMouseDown);
   document.addEventListener("mousemove", handleMouseMove);
@@ -444,6 +478,8 @@ onMounted(() => {
   flex: wrap;
   justify-content: space-between;
 }
+/* .grid-container .grid-item {
+} */
 
 .fc .fc-col-header-cell-cushion,
 .fc-timegrid-axis-cushion,

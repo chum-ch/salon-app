@@ -7,6 +7,7 @@ export default {
     UserInfo: "USER_INFO",
     ServiceItmeInfo: "SERVICE_ITEM_INFO",
     AllServicesItems: "ALL_SERVICE_ITEMS",
+    AllBookingsItems: "ALL_BOOKINGS_ITEMS",
   },
   ReturnDateType: {
     ISO_STR: "ISO_STR",

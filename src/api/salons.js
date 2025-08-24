@@ -1,5 +1,5 @@
-// const userApi = "https://95ipr7p9sa.execute-api.ap-southeast-1.amazonaws.com/dev";
-const userApi = "http://localhost:3000";
+const userApi = "https://fqrwyo8bae.execute-api.ap-southeast-1.amazonaws.com/dev";
+// const userApi = "http://localhost:3000";
 export default (axios)=>({
 
   // Service api
