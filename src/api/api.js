@@ -1,6 +1,6 @@
 
+import salons from "./salons";
 import users from "./users"
-
 // export default axios.create({
 //     baseURL: process.env.VUE_APP_BACKEND_URL,
 //     headers: {
@@ -9,5 +9,6 @@ import users from "./users"
 //   });
 export default (axios) => ({
   user: users(axios),
+  salon: salons(axios)
 });
 

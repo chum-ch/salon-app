@@ -1,4 +1,5 @@
 <template>
+  <PriToast class="w-max" />
   <div class="p-2">
     <CustomDialog
       ref="dialogEvent"
@@ -18,13 +19,13 @@
             @submit="submitEvent"
           >
             <div class="w-full my-2">
-              <span>ឈ្មោះសេវាកម្ម</span>
-              <PriInputText
-                name="ServiceName"
-                type="text"
-                placeholder="សេវាកម្ម"
-                fluid
-                v-model="initialValues.ServiceName"
+              <CustomDropdown
+                :options="serviceOptions"
+                :placeholder="'ជ្រើសរើសសេវាកម្ម'"
+                :label="'ឈ្មោះសេវាកម្ម'"
+                class="col-12 p-0"
+                v-model="serviceSelection"
+                @update:modelValue="getSelectOptionChange"
               />
               <PriMessage
                 v-if="$form.ServiceName?.invalid"
@@ -32,23 +33,6 @@
                 size="small"
                 variant="simple"
                 >{{ $form.ServiceName.error.message }}
-              </PriMessage>
-            </div>
-            <div class="w-full my-2">
-              <span>លេខទូរស័ព្ទ</span>
-              <PriInputText
-                name="PhoneNumber"
-                type="text"
-                placeholder="លេខទូរស័ព្ទរបស់អ្នក"
-                fluid
-                v-model="initialValues.PhoneNumber"
-              />
-              <PriMessage
-                v-if="$form.PhoneNumber?.invalid"
-                severity="error"
-                size="small"
-                variant="simple"
-                >{{ $form.PhoneNumber.error.message }}
               </PriMessage>
             </div>
             <div class="w-full my-2">
@@ -93,14 +77,11 @@
               class="w-full my-4"
               :loading="loading"
               :disabled="
-                !initialValues.ServiceName ||
                 !initialValues.StartDateTime ||
                 !initialValues.EndDateTime ||
-                !initialValues.PhoneNumber ||
-                $form.ServiceName?.invalid ||
-                $form.PhoneNumber?.invalid ||
                 $form.EndDateTime?.invalid ||
                 $form.StartDateTime?.invalid ||
+                !serviceSelection.Value ||
                 loading
               "
             />
@@ -115,7 +96,7 @@
       class="real-time-popup"
       :style="{ top: popupTop + 'px', left: popupLeft + 'px' }"
     >
-      <div class="popup-content">
+      <div class="popup-content text-xs">
         {{ selectionRange }}
       </div>
     </div>
@@ -123,7 +104,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, inject } from "vue";
+import { useToast } from "primevue/usetoast";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -133,36 +115,37 @@ import multiMonthPlugin from "@fullcalendar/multimonth";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { z } from "zod";
 import { Form } from "@primevue/forms";
+const toast = useToast();
 const calendarRef = ref(null);
 const isSelecting = ref(false);
 const selectionStart = ref(null);
 const dialogEvent = ref();
 const loading = ref(false);
+const $api = inject("$api");
+const $constanceVariable = inject("$constanceVariable");
+const $helperFun = inject("$helperFun")
 // New reactive variables for the pop-up's position and content
 const popupTop = ref(0);
 const popupLeft = ref(0);
 const selectionRange = ref("");
 const objModel = {
-  ServiceName: "",
-  PhoneNumber: "",
+  Service: {},
   StartDateTime: "",
   EndDateTime: "",
 };
 const initialValues = ref({ ...objModel });
+const endDate = ref();
+// Load data from sessionStorage
+const userInfo = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.UserInfo);
+let allServiceItems = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.AllServicesItems);
+allServiceItems = allServiceItems.map((item) => ({ Value: item.Name, ID: item.EntityItemId, Duration: item.Duration }));
+const serviceOptions = ref(allServiceItems);
 
+let itemService = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.ServiceItmeInfo);
+itemService = allServiceItems.find((item) => item.ID === itemService.EntityItemId);
+const serviceSelection = ref(itemService);
 const resolver = zodResolver(
   z.object({
-    ServiceName: z
-      .string()
-      .trim()
-      .min(1, { message: "Name number is requird." }),
-    PhoneNumber: z
-      .string()
-      .trim()
-      .min(1, { message: "Phone number is requird." })
-      .refine((value) => /^\d+$/.test(value), {
-        message: "No space and acept only numbers.",
-      }),
     StartDateTime: z.preprocess((val) => {
       if (val === "" || val === null) {
         return null;
@@ -202,7 +185,7 @@ const calendarOptions = reactive({
   // editable: true,
   // dragScroll: true,
   // Time
-  timeZone: "Asia/Phnom_Penh", // Set the timezone to Cambodia
+  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Set default the timezone to Cambodia 'Asia/Phnom_Penh'
   slotMinTime: "06:00:00",
   slotMaxTime: "24:00:00",
   // View
@@ -340,7 +323,7 @@ const handleMouseDown = (e) => {
     isSelecting.value = true;
     selectionStart.value = getDateTimeFromMousePosition(e);
     if (selectionStart.value) {
-      dayCell.classList.add("selection-start");
+      // dayCell.classList.add("selection-start");
     }
   }
 };
@@ -370,12 +353,13 @@ const endSelection = () => {
 
 const openDialogEVent = (startDateTime, endDateTime = null) => {
   initialValues.value.StartDateTime = new Date(startDateTime);
+  endDate.value = endDateTime || startDateTime;
   handleEndDateTime(endDateTime || startDateTime);
   dialogEvent.value.openDialog();
 };
 const handleEndDateTime = (endDateTime) => {
-  const addMinutes = 30;
   const endDate = new Date(endDateTime);
+  const addMinutes = serviceSelection.value.Duration ?? 0;  
   endDate.setMinutes(endDate.getMinutes() + addMinutes);
   initialValues.value.EndDateTime = endDate;
 };
@@ -384,11 +368,40 @@ const handleDateChange = (startDateTimeChange) => {
 };
 const closeDialogEvent = () => {
   initialValues.value = objModel;
+  serviceSelection.value = itemService;
   dialogEvent.value.closeDialog();
 };
 
-const submitEvent = async (e) => {
-  console.log("EVENT", initialValues.value);
+const getSelectOptionChange = () => {
+  handleEndDateTime(endDate.value);
+}
+const submitEvent = (e) => {
+  if (e.valid) {
+    loading.value = true;
+    setTimeout(async () => {
+      try {
+        toast.add({
+          severity: "success",
+          summary: "Form is submitted.",
+          life: 3000,
+        });
+
+        initialValues.value.Service = { Name: serviceSelection.value.Value, Id: serviceSelection.value.ID };
+        const body = {
+          ...initialValues.value,
+          EndDateTime: $helperFun.getLocalISOStr(initialValues.value.EndDateTime, $constanceVariable.ReturnDateType.ISO_STR),
+          StartDateTime: $helperFun.getLocalISOStr(initialValues.value.StartDateTime, $constanceVariable.ReturnDateType.ISO_STR),
+        }
+        await $api.salon.createBooking(userInfo.TenantId, userInfo.EntityItemId, body);
+        loading.value = false;
+        // closeDialogEvent();
+      } catch (error) {
+        loading.value = false;
+        console.error("Form create event error:", error);
+      }
+    }, 2000);
+  }
+  
 };
 onMounted(() => {
   const calendarEl = calendarRef.value.$el;
@@ -432,32 +445,29 @@ onMounted(() => {
   justify-content: space-between;
 }
 
-.grid-item {
-  /* text-align: center;
-  display: flex;
-  width: 100%; */
-}
 .fc .fc-col-header-cell-cushion,
 .fc-timegrid-axis-cushion,
 .fc-daygrid-day-number {
   text-decoration: none;
   color: gray;
 }
+th {
+  background: var(--vt-c-indigo);
+}
 .fc-event-time {
   display: none;
 }
-@media (max-width: 885px) {
+@media (max-width: 768px) {
   /* Tablet */
   .fc .fc-toolbar-title {
-    /* font-size: 15px; */
+    font-size: 15px;
+  }
+  .fc-col-header-cell-cushion,
+  .fc-timegrid-axis-cushion {
+    font-size: 13px;
   }
 }
 @media (max-width: 500px) {
-  .fc .fc-dayGridMonth-button,
-  .fc .fc-multiMonthYear-button,
-  .fc .fc-timeGridWeek-button {
-    display: none;
-  }
   tr a {
     font-size: 12px;
   }

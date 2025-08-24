@@ -8,13 +8,12 @@
     >
       <template #header>
         <div class="relative mx-auto">
-
           <PriTag
             v-if="item.Price.Discount"
             :value="`${item.Price.Discount}% OFF`"
             severity="success"
             class="absolute top-0 left-0"
-            style="color: #f98600; background: #fff9e5;"
+            style="color: #f98600; background: #fff9e5"
           />
           <img
             src="/imgs/placeholder-image.png"
@@ -24,7 +23,7 @@
           />
         </div>
       </template>
-      <template #title> {{ item.Title }} </template>
+      <template #title> {{ item.Name }} </template>
       <template #subtitle>
         <span class="discount-value flex">
           <i
@@ -32,12 +31,15 @@
             style="font-size: 1rem; color: #f98600"
           >
           </i>
-          <span class="amount">30 mins</span>
+          <span class="amount">{{ item.Duration }} mins</span>
         </span>
       </template>
       <template #content>
-        <p class="truncate-text overflow-scroll m-0 text-justify" style="height: 50px;">
-          {{ item.Content }}
+        <p
+          class="truncate-text overflow-scroll m-0 text-justify"
+          style="height: 50px"
+        >
+          {{ item.Description }}
         </p>
       </template>
       <template #footer>
@@ -47,16 +49,19 @@
               {{ item.Price.Currency === "USD" ? "$" : "៛" }}
               {{ calculatePriceAfterDiscount(item.Price) }}
             </h2>
-            <del 
+            <del
               v-if="item.Price.Discount"
-             class="mt-0 original-price mx-1 text-red-500">
+              class="mt-0 original-price mx-1 text-red-500"
+            >
               {{ item.Price.Currency === "USD" ? "$" : "៛" }}
               {{ item.Price.Original }}</del
             >
           </div>
-          <PriButton class="p-0 px-2 m-0"
+          <CustomButton
+            class="p-0 px-2 m-0"
             :label="'កក់ឥឡូវ'"
-           />
+            @onClick="onClickBooking(item)"
+          />
         </div>
       </template>
     </PriCard>
@@ -64,56 +69,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-const items = [
-  {
-    Image: "../../assets/p1.jpeg",
-    Title: "Advanced Card",
-    Subtitle: "Card subtitle",
-    Content: "ម៉ូដសក់កំពុងពេញនិយម",
-    Price: {
-      Currency: "USD",
-      Original: 20,
-      Discount: 5,
-    },
-  },
+import { inject, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
-  {
-    Image: "../../assets/p1.jpeg",
-    Title: "Advanced Card",
-    Subtitle: "Card subtitle",
-    Content: "Lorem ipsum dolor sit amet, ",
-    Price: {
-      Currency: "USD",
-      Original: 20,
-      Discount: 10,
-    },
-  },
-  {
-    Image: "../../assets/p1.jpeg",
-    Title: "Advanced Card",
-    Subtitle: "Card subtitle",
-    Content: "Lorem ipsum dolor sit amet.",
-    Price: {
-      Currency: "USD",
-      Original: 20,
-      Discount: 10,
-    },
-  },
-  {
-    Image: "../../assets/p1.jpeg",
-    Title: "Advanced Card",
-    Subtitle: "Card subtitle",
-    Content: "Lorem ipsum dolor sit amet, ",
-    Price: {
-      Currency: "USD",
-      Original: 20,
-      Discount: 10,
-    },
-  },
-];
+const $api = inject("$api");
+const $constanceVariable = inject("$constanceVariable");
+const $helperFun = inject("$helperFun");
+const route = useRouter();
+const items = ref([]);
+const userInfo = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.UserInfo);
 const calculatePriceAfterDiscount = (priceObject) => {
-  const originalPrice = priceObject.Original;
+  const originalPrice = priceObject.Amount;
   const discountPercentage = priceObject.Discount || 0; // Assuming this is a percentage
 
   if (
@@ -131,6 +97,22 @@ const calculatePriceAfterDiscount = (priceObject) => {
 
   return priceAfterDiscount;
 };
+const onClickBooking = (item) => {
+  $helperFun.setSessionItem(
+    $constanceVariable.SessionStorageKey.ServiceItmeInfo,
+    item
+  );
+  route.push("/calendar");
+};
+onMounted( async () => {
+  try {
+    const services = await $api.salon.listServices(userInfo.TenantId, userInfo.EntityItemId);
+    items.value = services.data;
+    $helperFun.setSessionItem($constanceVariable.SessionStorageKey.AllServicesItems, services.data);
+  } catch (error) {
+    console.error("List services error:", error);
+  }
+});
 </script>
 <style scoped>
 .card-container {
@@ -138,7 +120,6 @@ const calculatePriceAfterDiscount = (priceObject) => {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  
 }
 .card {
   box-shadow: #63636333 0px 2px 8px 0px;
@@ -154,14 +135,14 @@ const calculatePriceAfterDiscount = (priceObject) => {
   /* color: #f98600; */
 }
 .truncate-text {
-    /* overflow: scroll; */
-    /* display: -webkit-box; */
-    /* -webkit-box-orient: vertical; */
-    /* The number of lines to show before truncating */
-    /* -webkit-line-clamp: 4;  */
-    /* white-space: nowrap; */
-    /* text-overflow: ellipsis; */
-  }
+  /* overflow: scroll; */
+  /* display: -webkit-box; */
+  /* -webkit-box-orient: vertical; */
+  /* The number of lines to show before truncating */
+  /* -webkit-line-clamp: 4;  */
+  /* white-space: nowrap; */
+  /* text-overflow: ellipsis; */
+}
 /* --- Smartphones (landscape) and Small Tablets (portrait) --- */
 @media (max-width: 768px) {
   /* .card-container {

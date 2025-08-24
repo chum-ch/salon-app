@@ -48,7 +48,7 @@ watch(
         filter
         @filter="handleFilterChange"
         :placeholder="placeholder"
-        :filterPlaceholder="'Search'"
+        :filterPlaceholder="'ស្វែងរក'"
         optionLabel="Value"
         :invalid="required && !selectedValue && messageError ? true : false"
         @update:modelValue="updateModelValue"
@@ -72,24 +72,23 @@ watch(
         <template #emptyfilter>
           <small v-show="filterValue" class="flex justify-content-between">
             <span
-              >Value <span class="fw-bolder text-primary">{{ filterValue }}</span> is not
-              found!</span
+              > ឈ្មោះសេវាកម្ម <span class="fw-bolder text-primary">{{ filterValue }}</span> គ្មានទេ!</span
             >
-            <span
+            <!-- <span
               class="text-white customEmpty"
               @click="$emit('addNewDropdown', filterValue)"
               >Add New</span
-            >
+            > -->
           </small>
         </template>
         <template #empty>
           <small class="flex justify-content-between">
-            <span>No more item !</span>
-            <span
+            <span>មិនមានទិន្នន័យដែលត្រូវជ្រើសរើសទេ។</span>
+            <!-- <span
               class="text-white customEmpty"
               @click="$emit('addNewDropdown', filterValue)"
               >Add New</span
-            >
+            > -->
           </small>
         </template>
       </Dropdown>
