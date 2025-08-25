@@ -97,7 +97,6 @@ import { useToast } from "primevue/usetoast";
 import { Form } from "@primevue/forms";
 import { useRouter } from "vue-router";
 import ForgotPwdForm from "./ForgotPwdForm.vue";
-import { Password } from "primevue";
 const props = defineProps({
   isShowBackBtn: {
     type: Boolean,
@@ -120,6 +119,9 @@ const toast = useToast();
 const loading = ref(false);
 const isShowPwdForm = ref(false);
 const additionalData = ref(props.additionalData);
+
+const $constanceVariable = inject("$constanceVariable");
+const $helperFun = inject("$helperFun");
 // console.log("additionalData in resetPwdForm", additionalData.value);
 const initialValues = ref({
   NewPassword: "",
@@ -171,7 +173,7 @@ const onFormSubmit = (e) => {
           life: 3000,
         });
         const body = {
-          Code: Number(additionalData.value.ShopOwnerCode),
+          Code: Number(additionalData.value.CodeShop),
           Email: additionalData.value.Email,
           Password: initialValues.value.NewPassword,
           OtpCode: Number(additionalData.value.OtpCode),
@@ -186,6 +188,9 @@ const onFormSubmit = (e) => {
           }
           await $api.user.setPassword(additionalData.value.TenantId, bodySetPwd);
         }
+        delete additionalData.value.Email;
+        delete additionalData.value.OtpCode;
+        $helperFun.setSessionItem($constanceVariable.SessionStorageKey.UserInfo, additionalData.value);
         route.push("/home");
         loading.value = false;
       } catch (error) {

@@ -1,6 +1,26 @@
 <template>
   <div class="card-container">
+    <div
+      class="rounded border card"
+      v-if="items.length === 0"
+      v-for="i in 4"
+      :key="i"
+    >
+      <PriSkeleton width="100%" height="200px"> </PriSkeleton>
+      <div class="p-4">
+        <PriSkeleton width="90%" class="mb-3"></PriSkeleton>
+        <PriSkeleton width="70%" height=".5rem" class="mb-3"></PriSkeleton>
+        <PriSkeleton width="80%" height=".5rem" class="mb-2"></PriSkeleton>
+        <PriSkeleton width="90%" height=".5rem" class="mb-2"></PriSkeleton>
+        <PriSkeleton width="100%" height=".5rem" class="mb-2"></PriSkeleton>
+      </div>
+      <div class="p-3 w-full flex justify-content-between align-items-center">
+        <PriSkeleton width="5rem" height="1rem" class=""></PriSkeleton>
+        <PriSkeleton width="5rem" height="2rem" class=""></PriSkeleton>
+      </div>
+    </div>
     <PriCard
+      v-else
       class="card"
       style="overflow: hidden"
       v-for="item in items"
@@ -72,12 +92,22 @@
 import { inject, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
+const props = defineProps({
+  additionalData : {
+    type: Object,
+    default: () => ({}),
+  },
+});
+console.log("additionalData", props.additionalData);
+
 const $api = inject("$api");
 const $constanceVariable = inject("$constanceVariable");
 const $helperFun = inject("$helperFun");
 const route = useRouter();
 const items = ref([]);
-const userInfo = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.UserInfo);
+const userInfo = $helperFun.getSessionItem(
+  $constanceVariable.SessionStorageKey.UserInfo
+);
 const calculatePriceAfterDiscount = (priceObject) => {
   const originalPrice = priceObject.Amount;
   const discountPercentage = priceObject.Discount || 0; // Assuming this is a percentage
@@ -104,11 +134,17 @@ const onClickBooking = (item) => {
   );
   route.push("/calendar");
 };
-onMounted( async () => {
+onMounted(async () => {
   try {
-    const services = await $api.salon.listServices(userInfo.TenantId, userInfo.EntityItemId);
+    const services = await $api.salon.listServices(
+      userInfo.TenantId,
+      userInfo.EntityItemId
+    );
     items.value = services.data;
-    $helperFun.setSessionItem($constanceVariable.SessionStorageKey.AllServicesItems, services.data);
+    $helperFun.setSessionItem(
+      $constanceVariable.SessionStorageKey.AllServicesItems,
+      services.data
+    );
   } catch (error) {
     console.error("List services error:", error);
   }

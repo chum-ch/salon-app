@@ -96,7 +96,7 @@
   <PasswordForm
     v-else
     @onBackClick="isShowPwdForm = false"
-    :additionalData="initialValues"
+    :additionalData="additionalData"
   />
 </template>
 
@@ -112,7 +112,6 @@ import PasswordForm from "./PasswordForm.vue";
 const $api = inject("$api");
 const $constanceVariable = inject("$constanceVariable");
 const $helperFun = inject("$helperFun");
-
 const route = useRouter();
 const resetCode = (event) => {
   initialValues.value.ShopOwnerCode = event.value;
@@ -125,7 +124,7 @@ const initialValues = ref({
   FullName: "",
   PhoneNumber: "",
 });
-
+const additionalData = ref();
 const resolver = zodResolver(
   z.object({
     FullName: z.string().trim().min(1, { message: "Name number is requird." }),
@@ -152,7 +151,6 @@ const resolver = zodResolver(
       }),
   })
 );
-
 const onFormSubmit = async (e) => {
   if (e.valid) {
     loading.value = true;
@@ -172,12 +170,11 @@ const onFormSubmit = async (e) => {
         let login = await $api.user.userLogin(body);
         loading.value = false;
         // Passed TenantId to ForgotPwdForm
-        initialValues.value.TenantId = login.data.TenantId;
-
+        additionalData.value = login.data;
         const { UserType } = login.data;
-        $helperFun.setSessionItem($constanceVariable.SessionStorageKey.UserInfo, login.data);
         switch (UserType) {
           case $constanceVariable.UserType.Guest:
+            $helperFun.setSessionItem($constanceVariable.SessionStorageKey.UserInfo, login.data);
             route.push("/home");
             break;
           case $constanceVariable.UserType.Owner:
@@ -193,6 +190,7 @@ const onFormSubmit = async (e) => {
     }, 2000);
   }
 };
+
 </script>
 <style scoped>
 .login-form {

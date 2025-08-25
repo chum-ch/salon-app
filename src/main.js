@@ -34,6 +34,7 @@ import Checkbox from 'primevue/checkbox';
 import CheckboxGroup from 'primevue/checkboxgroup';
 import Tooltip from 'primevue/tooltip';
 import DatePicker from 'primevue/datepicker';
+import Skeleton from 'primevue/skeleton';
 
 // My Customs
 import CustomButton from "./components/customs/CustomButton.vue";
@@ -90,6 +91,7 @@ app.component('PriInputOtp', InputOtp);
 app.component('PriCheckbox', Checkbox);
 app.component('PriCheckboxGroup', CheckboxGroup);
 app.component('PriDatePicker', DatePicker);
+app.component('PriSkeleton', Skeleton);
 // Customs
 app.component("CustomButton", CustomButton);
 app.component("CustomDialog", CustomDialog);

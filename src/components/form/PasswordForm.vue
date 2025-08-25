@@ -89,12 +89,15 @@ const props = defineProps({
 defineEmits(["onBackClick"]);
 
 const $api = inject("$api");
+const $constanceVariable = inject("$constanceVariable");
+const $helperFun = inject("$helperFun");
 const toast = useToast();
 const route = useRouter();
 const loading = ref(false);
 const isShowPwdForm = ref(false);
 const additionalData = ref(props.additionalData);
 // console.log("additionalData", additionalData.value);
+
 const initialValues = ref({
   Password: "",
 });
@@ -129,13 +132,14 @@ const onFormSubmit = (e) => {
           life: 3000,
         });
         const body = {
-          CodeShop: Number(additionalData.value.ShopOwnerCode),
+          CodeShop: Number(additionalData.value.CodeShop),
           FullName: additionalData.value.FullName,
-          Phone: additionalData.value.PhoneNumber,
+          Phone: additionalData.value.Phone,
           Password: initialValues.value.Password,
         }
-        await $api.user.ownerLogin(body);
+        const login = await $api.user.ownerLogin(body);
         loading.value = false;
+        $helperFun.setSessionItem($constanceVariable.SessionStorageKey.UserInfo, login.data);
         route.push('/home')
 
       } catch (error) {
