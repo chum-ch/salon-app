@@ -7,7 +7,6 @@ const isLoading = ref(false);
 const isSkeleton = ref(true);
 const dialogMessage = ref();
 const refToFunMenu = ref();
-
 const msg = ref("Something error.");
 onMounted(() => {
   try {

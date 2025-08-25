@@ -79,7 +79,7 @@
           </div>
           <CustomButton
             class="p-0 px-2 m-0"
-            :label="'កក់ឥឡូវ'"
+            :label="'កក់សេវាកម្ម'"
             @onClick="onClickBooking(item)"
           />
         </div>
@@ -98,7 +98,7 @@ const props = defineProps({
     default: () => ({}),
   },
 });
-console.log("additionalData", props.additionalData);
+// console.log("additionalData", props.additionalData);
 
 const $api = inject("$api");
 const $constanceVariable = inject("$constanceVariable");

@@ -1,110 +1,150 @@
 <template>
   <PriToast class="w-max" />
-  <div class="p-2">
-    <CustomDialog
-      ref="dialogEvent"
-      :modalHeader="'ការកក់សេវាកម្ម'"
-      :hideFooter="true"
-      @onClickCloseDialog="closeDialogEvent"
-      @update:visible="closeDialogEvent"
-      :secondary="true"
-    >
-      <template #bodyDialog>
-        <div class="">
-          <Form
-            v-slot="$form"
-            :initialValues="initialValues"
-            :resolver="resolver"
-            class="flex flex-wrap w-full"
-            @submit="submitEvent"
-          >
-            <div class="w-full my-2">
-              <CustomDropdown
-                :options="serviceOptions"
-                :placeholder="'ជ្រើសរើសសេវាកម្ម'"
-                :label="'ឈ្មោះសេវាកម្ម'"
-                class="col-12 p-0"
-                v-model="serviceSelection"
-                @update:modelValue="getSelectOptionChange"
-              />
-              <PriMessage
-                v-if="$form.ServiceName?.invalid"
-                severity="error"
-                size="small"
-                variant="simple"
-                >{{ $form.ServiceName.error.message }}
-              </PriMessage>
-            </div>
-            <div class="w-full my-2">
-              <span>ពេលចាប់ផ្ដើម</span>
-              <PriDatePicker
-                id="datepicker-12h"
-                name="StartDateTime"
-                placeholder="ពេលចាប់ផ្ដើមធ្វើសេវាកម្ម"
-                v-model="initialValues.StartDateTime"
-                showTime
-                hourFormat="12"
-                fluid
-                showIcon
-                iconDisplay="input"
-                dateFormat="yy-mm-dd"
-                breakpoint="769px"
-                :stepMinute="5"
-                @value-change="handleDateChange"
-              />
-            </div>
-            <div class="w-full my-2">
-              <span>ពេលបញ្ចប់</span>
-              <PriDatePicker
-                placeholder="ពេលបញ្ចប់ធ្វើសេវាកម្ម"
-                id="datepicker-12h"
-                name="EndDateTime"
-                v-model="initialValues.EndDateTime"
-                showTime
-                hourFormat="12"
-                fluid
-                showIcon
-                iconDisplay="input"
-                dateFormat="yy-mm-dd"
-                breakpoint="769px"
-                disabled
-              />
-            </div>
-            <CustomButton
-              type="submit"
-              :severity="true"
-              :label="'កក់សេវាកម្មឥឡូវ'"
-              class="w-full my-4"
-              :loading="loading"
-              :disabled="
-                !initialValues.StartDateTime ||
-                !initialValues.EndDateTime ||
-                $form.EndDateTime?.invalid ||
-                $form.StartDateTime?.invalid ||
-                !serviceSelection.Value ||
-                loading
-              "
-            />
-          </Form>
-        </div>
-      </template>
-    </CustomDialog>
+  <FullCalendar ref="calendarRef" :options="calendarOptions" />
 
-    <FullCalendar ref="calendarRef" :options="calendarOptions" />
-    <div
-      v-if="isSelecting"
-      class="real-time-popup"
-      :style="{ top: popupTop + 'px', left: popupLeft + 'px' }"
-    >
-      <div class="popup-content text-xs">
-        {{ selectionRange }}
+  <CustomDialog
+    ref="dialogEvent"
+    :modalHeader="'ការកក់សេវាកម្ម'"
+    :hideFooter="true"
+    :secondary="true"
+  >
+    <template #bodyDialog>
+      <div class="">
+        <Form
+          v-slot="$form"
+          :initialValues="initialValues"
+          :resolver="resolver"
+          class="flex flex-wrap w-full"
+          @submit="submitEvent"
+        >
+          <div class="w-full my-2">
+            <CustomDropdown
+              :options="serviceOptions"
+              :placeholder="'ជ្រើសរើសសេវាកម្ម'"
+              :label="'ឈ្មោះសេវាកម្ម'"
+              class="col-12 p-0"
+              v-model="serviceSelection"
+              @update:modelValue="getSelectOptionChange"
+            />
+            <PriMessage
+              v-if="$form.ServiceName?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              >{{ $form.ServiceName.error.message }}
+            </PriMessage>
+          </div>
+          <div class="w-full my-2">
+            <span>ពេលចាប់ផ្ដើម</span>
+            <PriDatePicker
+              id="datepicker-12h"
+              name="StartDateTime"
+              placeholder="ពេលចាប់ផ្ដើមធ្វើសេវាកម្ម"
+              v-model="initialValues.StartDateTime"
+              showTime
+              hourFormat="12"
+              fluid
+              showIcon
+              iconDisplay="input"
+              dateFormat="yy-mm-dd"
+              breakpoint="769px"
+              :stepMinute="5"
+              @value-change="handleDateChange"
+            />
+          </div>
+          <div class="w-full my-2">
+            <span>ពេលបញ្ចប់</span>
+            <PriDatePicker
+              placeholder="ពេលបញ្ចប់ធ្វើសេវាកម្ម"
+              id="datepicker-12h"
+              name="EndDateTime"
+              v-model="initialValues.EndDateTime"
+              showTime
+              hourFormat="12"
+              fluid
+              showIcon
+              iconDisplay="input"
+              dateFormat="yy-mm-dd"
+              breakpoint="769px"
+              disabled
+            />
+          </div>
+          <CustomButton
+            type="submit"
+            :severity="true"
+            :label="'កក់សេវាកម្មឥឡូវ'"
+            class="w-full my-4"
+            :loading="loading"
+            :disabled="
+              !initialValues.StartDateTime ||
+              !initialValues.EndDateTime ||
+              $form.EndDateTime?.invalid ||
+              $form.StartDateTime?.invalid ||
+              !serviceSelection.Value ||
+              loading
+            "
+          />
+        </Form>
       </div>
+    </template>
+  </CustomDialog>
+  <div
+    v-if="isSelecting"
+    class="real-time-popup"
+    :style="{ top: popupTop + 'px', left: popupLeft + 'px' }"
+  >
+    <div class="popup-content text-xs">
+      {{ selectionRange }}
     </div>
   </div>
+  <CustomDialog
+    ref="dialogDetailsEvent"
+    :modalHeader="'ព័ត៌មានលំអិតអំពីការកក់សេវាកម្ម'"
+    :hideFooter="true"
+    :secondary="true"
+  >
+    <template #bodyDialog>
+      <div class="details-event">
+        <ul class="">
+          <li class="">
+            <div class="flex justify-between">
+              <p class="w-7rem">ឈ្មោះសេវាកម្ម: </p>
+              <p>{{ clickedEventDetails.title }}</p>
+            </div>
+          </li>
+
+          <li class="">
+            <div class="flex justify-between">
+              <p class="w-7rem">ឈ្មោះភ្ញៀវ: </p>
+              <p>{{ clickedEventDetails.GuestName }}</p>
+            </div>
+          </li>
+          <li class="">
+            <div class="flex justify-between">
+              <p class="w-7rem">លេខទូរស័ព្ទ: </p>
+              <p>{{ clickedEventDetails.PhoneNumber }}</p>
+            </div>
+          </li>
+          <li class="">
+            <div class="flex justify-between">
+              <p class="w-7rem">ពេលចាប់ផ្ដើម: </p>
+              <p>{{ $helperFun.convertISODateToLocalTime(clickedEventDetails.start) }}</p>
+            </div>
+          </li>
+          <li class="">
+            <div class="flex justify-between">
+              <p class="w-7rem">ពេលបញ្ចប់: </p>
+              <p>{{ $helperFun.convertISODateToLocalTime(clickedEventDetails.end) }}</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </template>
+  </CustomDialog>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, inject } from "vue";
+import { ref, onMounted, inject } from "vue";
 import { useToast } from "primevue/usetoast";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -120,10 +160,11 @@ const calendarRef = ref(null);
 const isSelecting = ref(false);
 const selectionStart = ref(null);
 const dialogEvent = ref();
+const dialogDetailsEvent = ref();
 const loading = ref(false);
 const $api = inject("$api");
 const $constanceVariable = inject("$constanceVariable");
-const $helperFun = inject("$helperFun")
+const $helperFun = inject("$helperFun");
 // New reactive variables for the pop-up's position and content
 const popupTop = ref(0);
 const popupLeft = ref(0);
@@ -135,14 +176,34 @@ const objModel = {
 };
 const initialValues = ref({ ...objModel });
 const endDate = ref();
+const clickedEventDetails = ref({
+  ServiceName: "",
+  GuestName: "",
+  PhoneNumber: "",
+  start: "",
+  end: "",
+});
+
 // Load data from sessionStorage
-const userInfo = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.UserInfo);
-let allServiceItems = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.AllServicesItems);
-allServiceItems = allServiceItems.map((item) => ({ Value: item.Name, ID: item.EntityItemId, Duration: item.Duration }));
+const userInfo = $helperFun.getSessionItem(
+  $constanceVariable.SessionStorageKey.UserInfo
+);
+let allServiceItems = $helperFun.getSessionItem(
+  $constanceVariable.SessionStorageKey.AllServicesItems
+);
+allServiceItems = allServiceItems.map((item) => ({
+  Value: item.Name,
+  ID: item.EntityItemId,
+  Duration: item.Duration,
+}));
 const serviceOptions = ref(allServiceItems);
 
-let itemService = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.ServiceItmeInfo);
-itemService = allServiceItems.find((item) => item.ID === itemService.EntityItemId);
+let itemService = $helperFun.getSessionItem(
+  $constanceVariable.SessionStorageKey.ServiceItmeInfo
+);
+itemService = allServiceItems.find(
+  (item) => item.ID === itemService.EntityItemId
+);
 const serviceSelection = ref(itemService);
 const resolver = zodResolver(
   z.object({
@@ -163,6 +224,35 @@ const resolver = zodResolver(
   })
 );
 
+// Define the breakpoint for 'mobile' (e.g., 768 pixels)
+// 1. Define the initial view based on the current window width
+let initialViewSetting;
+if (window.innerWidth < 768) {
+  // Mobile view: 2-day time grid
+  initialViewSetting = "timeGridTwoDay";
+} else if (window.innerWidth < 992) {
+  initialViewSetting = "timeGridFourDay";
+} else {
+  // Desktop/Tablet view: Full week time grid
+  initialViewSetting = "timeGridWeek";
+}
+
+// Function to handle the click
+const handleEventClick = (clickInfo) => {
+  // 1. Extract necessary event data
+  const event = clickInfo.event;
+
+  // Store event data, including extended props, in a reactive variable
+  clickedEventDetails.value = {
+    title: event.title,
+    start: event.startStr,
+    end: event.endStr,
+    ...event.extendedProps, // Include GuestName, PhoneNumber, etc.
+  };
+
+  // 2. Open the dialog
+  dialogDetailsEvent.value.openDialog();
+};
 const calendarOptions = ref({
   plugins: [
     dayGridPlugin,
@@ -189,7 +279,7 @@ const calendarOptions = ref({
   slotMinTime: "06:00:00",
   slotMaxTime: "24:00:00",
   // View
-  initialView: "timeGridWeek",
+  initialView: initialViewSetting,
   // Other
   selectable: true,
   selectMirror: true,
@@ -198,7 +288,7 @@ const calendarOptions = ref({
   handleWindowResize: true,
   // navLinks: false, // can click day/week names to navigate views
   weekNumbers: true,
-  hiddenDays: [0, 7], // Exclude Sunday (0) and Saturday (6)
+  // hiddenDays: [0, 3, 4, 5, 6, 7], // Exclude Sunday (0) and Saturday (6)
   // selectable: true,
   nowIndicator: true,
   dayMaxEvents: true, // allow "more" link when too many events
@@ -206,20 +296,21 @@ const calendarOptions = ref({
 
   // Events
   // Get calendar event form parent
-  // eventClick: this.editEventCalendar,
+  eventClick: handleEventClick,
   eventDidMount: function (info) {
-    const guestName = info.event.extendedProps.GuestName || ''
-    const ph = info.event.extendedProps.PhoneNumber || ''
-    const title = info.event.title || ''
-    
-    info.el.querySelector('.fc-event-title').innerHTML =
-      `
-      <div class="event-title text-center font-bold text-primary">${info.event.title}</div>
-      <div class="grid-container">
-        <div class="grid-item">${guestName}</div>
-        <div class="grid-item">${ph}</div>
-      </div>
-      `
+    const guestName = info.event.extendedProps.GuestName || "";
+    const ph = info.event.extendedProps.PhoneNumber || "";
+    const title = info.event.title || "";
+
+    if (info.el.querySelector(".fc-event-title")) {
+      info.el.querySelector(".fc-event-title").innerHTML = `
+        <div class="event-title text-center font-bold">${title}</div>
+        <div class="grid-container">
+          <div class="grid-item">${ph}</div>
+          <div class="grid-item">${guestName}</div>
+        </div>
+        `;
+    }
   },
   events: [
     {
@@ -231,28 +322,8 @@ const calendarOptions = ref({
         GuestName: "",
         PhoneNumber: "",
       },
+      //   backgroundColor: "green",
     },
-    {
-      title: "John - Haircut",
-      start: "2025-08-23T07:30:00",
-    },
-    { title: "Jane - Manicure", end: "2025-08-23T09:00:00" },
-    // {
-    //   title: "Vue js",
-    //   start: "2023-06-09T07:30:00",
-    //   end: "2023-06-09T09:00:00",
-    // },
-    // {
-    //   title: "event 1",
-    //   date: "2023-06-10",
-    // },
-    // { title: "event 2", start: "2023-06-14T07:30:00" },
-    // {
-    //   title: "Birthday Party",
-    //   start: "2023-06-11T00:00:00",
-    //   end: "2023-06-11T24:00:00",
-    //   backgroundColor: "green",
-    // },
   ],
 
   // Toolbar
@@ -269,6 +340,16 @@ const calendarOptions = ref({
     dayGridMonth: { buttonText: "Month" },
     //   dayGridWeek: { buttonText: "Week" },
     //   listMonth: { buttonText: "Event" },
+    timeGridTwoDay: {
+      type: "timeGrid", // Base the view on the timeGrid (day/week columns with a vertical time axis)
+      duration: { days: 2 }, // Specify the duration to be 2 days
+      buttonText: "2 Day", // Optional: Text for a button if you add it to the headerToolbar
+    },
+    timeGridFourDay: {
+      type: "timeGrid", // Base the view on the timeGrid (day/week columns with a vertical time axis)
+      duration: { days: 4 }, // Specify the duration to be 2 days
+      buttonText: "4 Day", // Optional: Text for a button if you add it to the headerToolbar
+    },
   },
 });
 
@@ -360,7 +441,7 @@ const openDialogEVent = (startDateTime, endDateTime = null) => {
 };
 const handleEndDateTime = (endDateTime) => {
   const endDate = new Date(endDateTime);
-  const addMinutes = serviceSelection.value.Duration ?? 0;  
+  const addMinutes = serviceSelection.value.Duration ?? 0;
   endDate.setMinutes(endDate.getMinutes() + addMinutes);
   initialValues.value.EndDateTime = endDate;
 };
@@ -375,18 +456,22 @@ const closeDialogEvent = () => {
 
 const getSelectOptionChange = () => {
   handleEndDateTime(endDate.value);
-}
-
+};
 
 const loadBookingsFromSessionStorage = async () => {
-  const bookings = $helperFun.getSessionItem($constanceVariable.SessionStorageKey.AllBookingsItems);
+  const bookings = $helperFun.getSessionItem(
+    $constanceVariable.SessionStorageKey.AllBookingsItems
+  );
   if (bookings) {
     calendarOptions.value.events = bookings;
   }
 };
 const listBookings = async () => {
   try {
-    const bookings = await $api.salon.listBookings(userInfo.TenantId, userInfo.EntityItemId);
+    const bookings = await $api.salon.listBookings(
+      userInfo.TenantId,
+      userInfo.EntityItemId
+    );
     if (bookings.data) {
       const events = bookings.data.map((item) => ({
         title: item.Service.Name,
@@ -395,17 +480,20 @@ const listBookings = async () => {
         extendedProps: {
           GuestName: item.User.FullName,
           PhoneNumber: item.User.Phone,
-        }
+        },
+        backgroundColor: item.Service.BackgroundColor,
       }));
-      
-      $helperFun.setSessionItem($constanceVariable.SessionStorageKey.AllBookingsItems, events);
+
+      $helperFun.setSessionItem(
+        $constanceVariable.SessionStorageKey.AllBookingsItems,
+        events
+      );
       loadBookingsFromSessionStorage();
     }
-    
   } catch (error) {
     console.error("List bookings error:", error);
   }
-}
+};
 
 const submitEvent = (e) => {
   if (e.valid) {
@@ -418,13 +506,26 @@ const submitEvent = (e) => {
           life: 3000,
         });
 
-        initialValues.value.Service = { Name: serviceSelection.value.Value, Id: serviceSelection.value.ID };
+        initialValues.value.Service = {
+          Name: serviceSelection.value.Value,
+          Id: serviceSelection.value.ID,
+        };
         const body = {
           ...initialValues.value,
-          EndDateTime: $helperFun.getLocalISOStr(initialValues.value.EndDateTime, $constanceVariable.ReturnDateType.ISO_STR),
-          StartDateTime: $helperFun.getLocalISOStr(initialValues.value.StartDateTime, $constanceVariable.ReturnDateType.ISO_STR),
-        }
-        await $api.salon.createBooking(userInfo.TenantId, userInfo.EntityItemId, body);
+          EndDateTime: $helperFun.getLocalISOStr(
+            initialValues.value.EndDateTime,
+            $constanceVariable.ReturnDateType.ISO_STR
+          ),
+          StartDateTime: $helperFun.getLocalISOStr(
+            initialValues.value.StartDateTime,
+            $constanceVariable.ReturnDateType.ISO_STR
+          ),
+        };
+        await $api.salon.createBooking(
+          userInfo.TenantId,
+          userInfo.EntityItemId,
+          body
+        );
         loading.value = false;
         await listBookings();
         closeDialogEvent();
@@ -434,9 +535,9 @@ const submitEvent = (e) => {
       }
     }, 2000);
   }
-  
 };
-onMounted( async() => {
+
+onMounted(async () => {
   await listBookings();
   const calendarEl = calendarRef.value.$el;
   calendarEl.addEventListener("mousedown", handleMouseDown);
@@ -466,7 +567,7 @@ onMounted( async() => {
 }
 
 .fc-event-title-container {
-  padding: 5px;
+  /* padding: 5px; */
   box-sizing: border-box;
   /* font-size: 12px; */
 }
@@ -474,9 +575,9 @@ onMounted( async() => {
   /* display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 1fr;  */
-  display: flex;
+  /* display: flex;
   flex: wrap;
-  justify-content: space-between;
+  justify-content: space-between; */
 }
 /* .grid-container .grid-item {
 } */

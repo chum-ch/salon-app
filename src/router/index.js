@@ -45,17 +45,15 @@ const router = createRouter({
   ],
 });
 
-// router.beforeEach((to, from, next) => {
-//   const isProtected = to.meta.requiresAuth;
-//   const infoUser = helperFun.getSessionItem(
-//     constanceVariable.SessionStorageKey.UserInfo
-//   );
-//   console.log("infoUser", isProtected, infoUser);
-  
-//   if (isProtected && !infoUser) {
-//     next({ path: "/" });
-//   } else {
-//     next();
-//   }
-// });
+router.beforeEach((to, from, next) => {  
+  const isProtected = to.meta.requiresAuth;
+  const infoUser = helperFun.getSessionItem(
+    constanceVariable.SessionStorageKey.UserInfo
+  );
+  if (isProtected && !infoUser) {
+    next({ path: "/" });
+  } else {
+    next();
+  }
+});
 export default router;

@@ -9,7 +9,7 @@ const setSessionItem = (key, value) => {
   try {
     sessionStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error('Error saving to sessionStorage:', error);
+    console.error("Error saving to sessionStorage:", error);
   }
 };
 
@@ -23,7 +23,7 @@ const getSessionItem = (key) => {
     const item = sessionStorage.getItem(key);
     return item ? JSON.parse(item) : null;
   } catch (error) {
-    console.error('Error retrieving from sessionStorage:', error);
+    console.error("Error retrieving from sessionStorage:", error);
     return null;
   }
 };
@@ -36,7 +36,7 @@ const removeSessionItem = (key) => {
   try {
     sessionStorage.removeItem(key);
   } catch (error) {
-    console.error('Error removing from sessionStorage:', error);
+    console.error("Error removing from sessionStorage:", error);
   }
 };
 
@@ -47,7 +47,7 @@ const clearSession = () => {
   try {
     sessionStorage.clear();
   } catch (error) {
-    console.error('Error clearing sessionStorage:', error);
+    console.error("Error clearing sessionStorage:", error);
   }
 };
 
@@ -80,7 +80,52 @@ const getLocalISOStr = (targetDate, returnType) => {
 
   // Combine all parts into the final string
   const isoStr = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${offsetSign}${offsetHours}:${offsetMinutesPart}`;
-  return returnType === constanceVariable.ReturnDateType.ISO_STR ? isoStr: date;
+  return returnType === constanceVariable.ReturnDateType.ISO_STR
+    ? isoStr
+    : date;
+};
+
+/**
+ * Formats an ISO date string (e.g., 2025-08-27T06:00:00+07:00)
+ * to YYYY-MM-DD HH:MMAM/PM.
+ * * @param {string} isoString The date string from FullCalendar events.
+ * @param {string} [timeZone='Asia/Phnom_Penh'] The timezone to format the time in.
+ * @returns {string} The formatted date string.
+ */
+const convertISODateToLocalTime = (isoString) => {
+  if (!isoString) return '';
+  
+  const dateObject = new Date(isoString);
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const options = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: timeZone,
+  };
+
+    // Use a valid language tag (locale) as the first argument, e.g., 'en-US'.
+    const formatter = new Intl.DateTimeFormat('en-US', options); 
+    
+    // 1. Get the full formatted string (e.g., "08/27/2025, 06:00 AM")
+    const fullFormatted = formatter.format(dateObject);
+
+    // 2. Split and reorder the date and time components
+    // Example: ["08/27/2025", "06:00 AM"]
+    const [datePart, timePart] = fullFormatted.split(', ');
+    
+    // Date: Split "MM/DD/YYYY" and rebuild as "YYYY-MM-DD"
+    const [month, day, year] = datePart.split('/'); 
+    const standardDate = `${year}-${month}-${day}`;
+
+    // Time: "HH:MMAM/PM" (clean up space and ensure uppercase AM/PM)
+    const cleanedTimePart = timePart.toUpperCase().replace(' ', '');
+
+    // 3. Combine
+    return `${standardDate} ${cleanedTimePart}`;
 };
 export default {
   setSessionItem,
@@ -88,4 +133,5 @@ export default {
   removeSessionItem,
   clearSession,
   getLocalISOStr,
+  convertISODateToLocalTime,
 };
