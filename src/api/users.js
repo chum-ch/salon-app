@@ -27,5 +27,8 @@ export default (axios)=>({
     },
     setPassword(tenantId, data){
         return axios.put(`${userApi}/tenants/${tenantId}/set-password`, data)
-    }
+    },
+    listUsers(tenantId, userId){
+        return axios.get(`${userApi}/tenants/${tenantId}/users/${userId}`)
+    },
 })

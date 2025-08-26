@@ -107,7 +107,7 @@ h3 {
 .container-menu {
   /* display: flex;
   justify-content: space-between; */
-  padding: 0.3rem; 
+  padding: 0.3rem 0; 
   backdrop-filter: blur(10px);
   background-color: #11c29000; /* Optional: Adds a translucent color to enhance the effect */
 }

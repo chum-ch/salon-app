@@ -1,6 +1,6 @@
 <template>
   <PriToast class="w-max" />
-  <FullCalendar ref="calendarRef" :options="calendarOptions" />
+  <FullCalendar ref="calendarRef" :options="calendarOptions" class="mt-3" />
 
   <CustomDialog
     ref="dialogEvent"
@@ -32,6 +32,39 @@
               size="small"
               variant="simple"
               >{{ $form.ServiceName.error.message }}
+            </PriMessage>
+          </div>
+
+          <div class="w-full my-2">
+            <PriInputText
+              name="GuestName"
+              type="text"
+              placeholder="ឈ្មោះរបស់អ្នក"
+              fluid
+              v-model="initialValues.GuestName"
+            />
+            <PriMessage
+              v-if="$form.GuestName?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              >{{ $form.GuestName.error.message }}
+            </PriMessage>
+          </div>
+          <div class="w-full my-2">
+            <PriInputText
+              name="Phone"
+              type="text"
+              placeholder="លេខទូរស័ព្ទរបស់អ្នក"
+              fluid
+              v-model="initialValues.Phone"
+            />
+            <PriMessage
+              v-if="$form.Phone?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              >{{ $form.Phone.error.message }}
             </PriMessage>
           </div>
           <div class="w-full my-2">
@@ -76,11 +109,15 @@
             class="w-full my-4"
             :loading="loading"
             :disabled="
+              !initialValues.GuestName ||
+              !initialValues.Phone ||
               !initialValues.StartDateTime ||
               !initialValues.EndDateTime ||
               $form.EndDateTime?.invalid ||
+              $form.GuestName?.invalid ||
+              $form.Phone?.invalid ||
               $form.StartDateTime?.invalid ||
-              !serviceSelection.Value ||
+              !serviceSelection?.Value ||
               loading
             "
           />
@@ -108,35 +145,48 @@
         <ul class="">
           <li class="">
             <div class="flex justify-between">
-              <p class="w-7rem">ឈ្មោះសេវាកម្ម: </p>
-              <p>{{ clickedEventDetails.title }}</p>
+              <p class="w-7rem">ឈ្មោះសេវាកម្ម:</p>
+              <p>{{ clickedEventDetails.ServiceName }}</p>
             </div>
           </li>
 
           <li class="">
             <div class="flex justify-between">
-              <p class="w-7rem">ឈ្មោះភ្ញៀវ: </p>
+              <p class="w-7rem">ឈ្មោះភ្ញៀវ:</p>
               <p>{{ clickedEventDetails.GuestName }}</p>
             </div>
           </li>
           <li class="">
             <div class="flex justify-between">
-              <p class="w-7rem">លេខទូរស័ព្ទ: </p>
-              <a :href="`tel:${clickedEventDetails.PhoneNumber}`"> 
+              <p class="w-7rem">លេខទូរស័ព្ទ:</p>
+              <a :href="`tel:${clickedEventDetails.PhoneNumber}`">
                 <!-- <i class="pi pi-phone"></i> -->
-              {{ clickedEventDetails.PhoneNumber }}</a>
+                {{ clickedEventDetails.PhoneNumber }}</a
+              >
             </div>
           </li>
           <li class="">
             <div class="flex justify-between">
-              <p class="w-7rem">ពេលចាប់ផ្ដើម: </p>
-              <p>{{ $helperFun.convertISODateToLocalTime(clickedEventDetails.start) }}</p>
+              <p class="w-7rem">ពេលចាប់ផ្ដើម:</p>
+              <p>
+                {{
+                  $helperFun.convertISODateToLocalTime(
+                    clickedEventDetails.StartDateTime
+                  )
+                }}
+              </p>
             </div>
           </li>
           <li class="">
             <div class="flex justify-between">
-              <p class="w-7rem">ពេលបញ្ចប់: </p>
-              <p>{{ $helperFun.convertISODateToLocalTime(clickedEventDetails.end) }}</p>
+              <p class="w-7rem">ពេលបញ្ចប់:</p>
+              <p>
+                {{
+                  $helperFun.convertISODateToLocalTime(
+                    clickedEventDetails.EndDateTime
+                  )
+                }}
+              </p>
             </div>
           </li>
         </ul>
@@ -172,6 +222,8 @@ const popupTop = ref(0);
 const popupLeft = ref(0);
 const selectionRange = ref("");
 const objModel = {
+  GuestName: "",
+  Phone: "",
   Service: {},
   StartDateTime: "",
   EndDateTime: "",
@@ -181,15 +233,17 @@ const endDate = ref();
 const clickedEventDetails = ref({
   ServiceName: "",
   GuestName: "",
-  PhoneNumber: "",
-  start: "",
-  end: "",
+  Phone: "",
+  StartDateTime: "",
+  EndDateTime: "",
 });
 
 // Load data from sessionStorage
 const userInfo = $helperFun.getSessionItem(
   $constanceVariable.SessionStorageKey.UserInfo
 );
+initialValues.value.GuestName = userInfo?.FullName;
+initialValues.value.Phone = userInfo?.Phone;
 let allServiceItems = $helperFun.getSessionItem(
   $constanceVariable.SessionStorageKey.AllServicesItems
 );
@@ -212,11 +266,18 @@ if (itemService) {
 const serviceSelection = ref(itemService);
 const resolver = zodResolver(
   z.object({
+    GuestName: z.string().trim().min(1, { message: "Name number is requird." }),
+    Phone: z
+      .string()
+      .trim()
+      .min(1, { message: "Phone number is requird." })
+      .refine((value) => /^\d+$/.test(value), {
+        message: "No space and acept only numbers.",
+      }),
     StartDateTime: z.preprocess((val) => {
       if (val === "" || val === null) {
         return null;
       }
-
       return new Date(val);
     }, z.union([z.date(), z.null().refine((val) => val !== null, { message: "Date is required." })])),
     EndDateTime: z.preprocess((val) => {
@@ -249,9 +310,9 @@ const handleEventClick = (clickInfo) => {
 
   // Store event data, including extended props, in a reactive variable
   clickedEventDetails.value = {
-    title: event.title,
-    start: event.startStr,
-    end: event.endStr,
+    ServiceName: event.title,
+    StartDateTime: event.startStr,
+    EndDateTime: event.endStr,
     ...event.extendedProps, // Include GuestName, PhoneNumber, etc.
   };
 
@@ -446,7 +507,9 @@ const openDialogEVent = (startDateTime, endDateTime = null) => {
 };
 const handleEndDateTime = (endDateTime) => {
   const endDate = new Date(endDateTime);
-  const addMinutes = serviceSelection.value.Duration ?? 0;
+  const addMinutes = serviceSelection.value
+    ? serviceSelection.value.Duration
+    : 0;
   endDate.setMinutes(endDate.getMinutes() + addMinutes);
   initialValues.value.EndDateTime = endDate;
 };
@@ -484,12 +547,12 @@ const listBookings = async () => {
           start: item.StartDateTime,
           end: item.EndDateTime,
           extendedProps: {
-            GuestName: item.User.FullName,
-            PhoneNumber: item.User.Phone,
+            GuestName: item.GuestName,
+            PhoneNumber: item.Phone
           },
           backgroundColor: item.Service.BackgroundColor,
         }));
-  
+
         $helperFun.setSessionItem(
           $constanceVariable.SessionStorageKey.AllBookingsItems,
           events
@@ -518,7 +581,9 @@ const submitEvent = (e) => {
           Id: serviceSelection.value.ID,
         };
         const body = {
-          ...initialValues.value,
+          GuestName: initialValues.value.GuestName,
+          Phone: initialValues.value.Phone,
+          Service: initialValues.value.Service,
           EndDateTime: $helperFun.getLocalISOStr(
             initialValues.value.EndDateTime,
             $constanceVariable.ReturnDateType.ISO_STR

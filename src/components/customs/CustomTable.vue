@@ -219,7 +219,7 @@ defineExpose({
 <template>
   <div class="table mt-2">
     <div
-      class="flex justify-content-between sm:flex-row-reverse flex-wrap mx-2"
+      class="flex justify-content-between sm:flex-row-reverse flex-wrap"
       v-if="isShowHeaderAction"
     >
       <div class="flex">
@@ -321,7 +321,8 @@ defineExpose({
   padding: 0;
   border-radius: 0;
 }
-span.p-select-label {
+
+.p-paginator-content span.p-select-label {
   padding: 0 .5rem;
 }
 @media (max-width: 600px) {
