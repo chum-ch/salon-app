@@ -122,7 +122,9 @@
           <li class="">
             <div class="flex justify-between">
               <p class="w-7rem">លេខទូរស័ព្ទ: </p>
-              <p>{{ clickedEventDetails.PhoneNumber }}</p>
+              <a :href="`tel:${clickedEventDetails.PhoneNumber}`"> 
+                <!-- <i class="pi pi-phone"></i> -->
+              {{ clickedEventDetails.PhoneNumber }}</a>
             </div>
           </li>
           <li class="">
