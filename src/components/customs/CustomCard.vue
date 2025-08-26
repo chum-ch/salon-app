@@ -136,15 +136,17 @@ const onClickBooking = (item) => {
 };
 onMounted(async () => {
   try {
-    const services = await $api.salon.listServices(
-      userInfo.TenantId,
-      userInfo.EntityItemId
-    );
-    items.value = services.data;
-    $helperFun.setSessionItem(
-      $constanceVariable.SessionStorageKey.AllServicesItems,
-      services.data
-    );
+    if (userInfo) {
+      const services = await $api.salon.listServices(
+        userInfo.TenantId,
+        userInfo.EntityItemId
+      );
+      items.value = services.data;
+      $helperFun.setSessionItem(
+        $constanceVariable.SessionStorageKey.AllServicesItems,
+        services.data
+      );
+    }
   } catch (error) {
     console.error("List services error:", error);
   }

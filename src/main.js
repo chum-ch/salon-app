@@ -43,6 +43,7 @@ import CustomCard from "./components/customs/CustomCard.vue";
 import CustomMenu from "./components/customs/CustomMenu.vue";
 import CustomDropdown from "./components/customs/CustomDropdown.vue";
 import CustomFullCalender from "./components/customs/CustomFullCalender.vue";
+import CustomTable from './components/customs/CustomTable.vue';
 const pinia = createPinia()
 const app = createApp(App)
 
@@ -99,6 +100,7 @@ app.component("CustomCard", CustomCard);
 app.component("CustomMenu", CustomMenu);
 app.component("CustomDropdown", CustomDropdown);
 app.component("CustomFullCalender", CustomFullCalender);
+app.component("CustomTable", CustomTable);
 app.directive('tooltip', Tooltip);
 app.provide("$api", API(axios));
 app.provide("$constanceVariable", ConstanceVariable);

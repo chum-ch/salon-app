@@ -191,19 +191,22 @@ const userInfo = $helperFun.getSessionItem(
 let allServiceItems = $helperFun.getSessionItem(
   $constanceVariable.SessionStorageKey.AllServicesItems
 );
-allServiceItems = allServiceItems.map((item) => ({
-  Value: item.Name,
-  ID: item.EntityItemId,
-  Duration: item.Duration,
-}));
+if (allServiceItems) {
+  allServiceItems = allServiceItems.map((item) => ({
+    Value: item.Name,
+    ID: item.EntityItemId,
+    Duration: item.Duration,
+  }));
+}
 const serviceOptions = ref(allServiceItems);
-
 let itemService = $helperFun.getSessionItem(
   $constanceVariable.SessionStorageKey.ServiceItmeInfo
 );
-itemService = allServiceItems.find(
-  (item) => item.ID === itemService.EntityItemId
-);
+if (itemService) {
+  itemService = allServiceItems.find(
+    (item) => item.ID === itemService.EntityItemId
+  );
+}
 const serviceSelection = ref(itemService);
 const resolver = zodResolver(
   z.object({
@@ -468,27 +471,29 @@ const loadBookingsFromSessionStorage = async () => {
 };
 const listBookings = async () => {
   try {
-    const bookings = await $api.salon.listBookings(
-      userInfo.TenantId,
-      userInfo.EntityItemId
-    );
-    if (bookings.data) {
-      const events = bookings.data.map((item) => ({
-        title: item.Service.Name,
-        start: item.StartDateTime,
-        end: item.EndDateTime,
-        extendedProps: {
-          GuestName: item.User.FullName,
-          PhoneNumber: item.User.Phone,
-        },
-        backgroundColor: item.Service.BackgroundColor,
-      }));
-
-      $helperFun.setSessionItem(
-        $constanceVariable.SessionStorageKey.AllBookingsItems,
-        events
+    if (userInfo) {
+      const bookings = await $api.salon.listBookings(
+        userInfo.TenantId,
+        userInfo.EntityItemId
       );
-      loadBookingsFromSessionStorage();
+      if (bookings.data) {
+        const events = bookings.data.map((item) => ({
+          title: item.Service.Name,
+          start: item.StartDateTime,
+          end: item.EndDateTime,
+          extendedProps: {
+            GuestName: item.User.FullName,
+            PhoneNumber: item.User.Phone,
+          },
+          backgroundColor: item.Service.BackgroundColor,
+        }));
+  
+        $helperFun.setSessionItem(
+          $constanceVariable.SessionStorageKey.AllBookingsItems,
+          events
+        );
+        loadBookingsFromSessionStorage();
+      }
     }
   } catch (error) {
     console.error("List bookings error:", error);
@@ -521,11 +526,13 @@ const submitEvent = (e) => {
             $constanceVariable.ReturnDateType.ISO_STR
           ),
         };
-        await $api.salon.createBooking(
-          userInfo.TenantId,
-          userInfo.EntityItemId,
-          body
-        );
+        if (userInfo) {
+          await $api.salon.createBooking(
+            userInfo.TenantId,
+            userInfo.EntityItemId,
+            body
+          );
+        }
         loading.value = false;
         await listBookings();
         closeDialogEvent();
