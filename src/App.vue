@@ -58,11 +58,11 @@ const openMenu = () => {
 </script>
 
 <template>
-  <div>
-    <div v-show="true" class="sticky top-0 z-1 text-white">
+  <div style="">
+    <div v-show="true" class="sticky top-0 z-1">
       <div class="container-menu">
         <PriButton
-          class="bg-transparent icon-bars"
+          class=" icon-bars color-primary mx-2"
           icon="pi pi-bars"
           @click="openMenu"
           v-if="$route.path !=='/' && $route.path !=='/signup'"
@@ -73,7 +73,7 @@ const openMenu = () => {
           <PriButton
             type="button"
             label="ការចុះឈ្មោះ"
-            class="p-0 px-2"
+            class="p-0 px-2 m-2"
             @click="route.push('/signup')"
           />
         </div>
