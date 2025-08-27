@@ -1,6 +1,12 @@
 <template>
   <PriToast class="w-max" />
-  <FullCalendar ref="calendarRef" :options="calendarOptions" class="mt-3" />
+  <SkeletonTableView v-if="showSkeletonTable" />
+  <FullCalendar
+    v-else
+    ref="calendarRef"
+    :options="calendarOptions"
+    class="mt-3"
+  />
 
   <CustomDialog
     ref="dialogEvent"
@@ -17,7 +23,41 @@
           class="flex flex-wrap w-full"
           @submit="submitEvent"
         >
-          <div class="w-full my-2">
+          <div class="w-full mb-2">
+            <span>ឈ្មោះ</span>
+            <PriInputText
+              name="GuestName"
+              type="text"
+              placeholder="ឈ្មោះរបស់អ្នក"
+              fluid
+              v-model="initialValues.GuestName"
+            />
+            <PriMessage
+              v-if="$form.GuestName?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              >{{ $form.GuestName.error.message }}
+            </PriMessage>
+          </div>
+          <div class="w-full mb-2">
+          <span>លេខទូរស័ព្ទ</span>
+            <PriInputText
+              name="Phone"
+              type="text"
+              placeholder="លេខទូរស័ព្ទរបស់អ្នក"
+              fluid
+              v-model="initialValues.Phone"
+            />
+            <PriMessage
+              v-if="$form.Phone?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              >{{ $form.Phone.error.message }}
+            </PriMessage>
+          </div>
+          <div class="w-full">
             <CustomDropdown
               :options="serviceOptions"
               :placeholder="'ជ្រើសរើសសេវាកម្ម'"
@@ -34,40 +74,7 @@
               >{{ $form.ServiceName.error.message }}
             </PriMessage>
           </div>
-
-          <div class="w-full my-2">
-            <PriInputText
-              name="GuestName"
-              type="text"
-              placeholder="ឈ្មោះរបស់អ្នក"
-              fluid
-              v-model="initialValues.GuestName"
-            />
-            <PriMessage
-              v-if="$form.GuestName?.invalid"
-              severity="error"
-              size="small"
-              variant="simple"
-              >{{ $form.GuestName.error.message }}
-            </PriMessage>
-          </div>
-          <div class="w-full my-2">
-            <PriInputText
-              name="Phone"
-              type="text"
-              placeholder="លេខទូរស័ព្ទរបស់អ្នក"
-              fluid
-              v-model="initialValues.Phone"
-            />
-            <PriMessage
-              v-if="$form.Phone?.invalid"
-              severity="error"
-              size="small"
-              variant="simple"
-              >{{ $form.Phone.error.message }}
-            </PriMessage>
-          </div>
-          <div class="w-full my-2">
+          <div class="w-full mb-2">
             <span>ពេលចាប់ផ្ដើម</span>
             <PriDatePicker
               id="datepicker-12h"
@@ -85,7 +92,7 @@
               @value-change="handleDateChange"
             />
           </div>
-          <div class="w-full my-2">
+          <div class="w-full mb-2">
             <span>ពេលបញ្ចប់</span>
             <PriDatePicker
               placeholder="ពេលបញ្ចប់ធ្វើសេវាកម្ម"
@@ -190,6 +197,11 @@
             </div>
           </li>
         </ul>
+        <!-- <CustomButton
+          @onClick="handleEditEvent(clickedEventDetails)"
+          :label="'កែប្រែ'"
+          class="w-full my-4"
+        /> -->
       </div>
     </template>
   </CustomDialog>
@@ -207,9 +219,11 @@ import multiMonthPlugin from "@fullcalendar/multimonth";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { z } from "zod";
 import { Form } from "@primevue/forms";
+import SkeletonTableView from "@/views/SkeletonTableView.vue";
 const toast = useToast();
 const calendarRef = ref(null);
 const isSelecting = ref(false);
+const showSkeletonTable = ref(true);
 const selectionStart = ref(null);
 const dialogEvent = ref();
 const dialogDetailsEvent = ref();
@@ -394,10 +408,19 @@ const calendarOptions = ref({
 
   // Toolbar
   titleFormat: { year: "numeric", month: "short", day: "numeric" },
+  customButtons: {
+    // Defines a new custom button named 'createEventButton'
+    createEventButton: {
+      text: 'បង្កើតថ្មី',
+      click: function() {
+        dialogEvent.value.openDialog();
+      }
+    }
+  },
   headerToolbar: {
     // left: "today,timeGridDay,timeGridWeek,dayGridMonth,multiMonthYear,listMonth",
     start: "prev,next today",
-    end: "",
+    end: "createEventButton",
     center: "title",
   },
   views: {
@@ -500,18 +523,20 @@ const endSelection = () => {
 };
 
 const openDialogEVent = (startDateTime, endDateTime = null) => {
+  console.log('i', initialValues.value);
+  
   initialValues.value.StartDateTime = new Date(startDateTime);
-  endDate.value = endDateTime || startDateTime;
   handleEndDateTime(endDateTime || startDateTime);
   dialogEvent.value.openDialog();
 };
 const handleEndDateTime = (endDateTime) => {
-  const endDate = new Date(endDateTime);
+  endDate.value = endDateTime;
+  const endDateT = new Date(endDateTime);
   const addMinutes = serviceSelection.value
     ? serviceSelection.value.Duration
     : 0;
-  endDate.setMinutes(endDate.getMinutes() + addMinutes);
-  initialValues.value.EndDateTime = endDate;
+  endDateT.setMinutes(endDateT.getMinutes() + addMinutes);
+  initialValues.value.EndDateTime = endDateT;
 };
 const handleDateChange = (startDateTimeChange) => {
   handleEndDateTime(startDateTimeChange);
@@ -523,7 +548,10 @@ const closeDialogEvent = () => {
 };
 
 const getSelectOptionChange = () => {
-  handleEndDateTime(endDate.value);
+  const date = endDate.value;
+  if (date) {
+    handleEndDateTime(date);
+  }
 };
 
 const loadBookingsFromSessionStorage = async () => {
@@ -534,6 +562,17 @@ const loadBookingsFromSessionStorage = async () => {
     calendarOptions.value.events = bookings;
   }
 };
+const handleEditEvent = (eventEdit) => {
+  console.log('eventEdit', eventEdit);
+  initialValues.value.GuestName = eventEdit.GuestName;
+  initialValues.value.Phone = eventEdit.PhoneNumber;
+  initialValues.value.Service = eventEdit.ServiceName;
+  initialValues.value.StartDateTime = $helperFun.getLocalISOStr(eventEdit.StartDateTime, $constanceVariable.ReturnDateType.OBJ_DATE);
+  initialValues.value.EndDateTime = $helperFun.getLocalISOStr(eventEdit.EndDateTime, $constanceVariable.ReturnDateType.OBJ_DATE);
+  serviceSelection.value = eventEdit.Service;
+  dialogEvent.value.openDialog();
+};
+
 const listBookings = async () => {
   try {
     if (userInfo) {
@@ -541,14 +580,21 @@ const listBookings = async () => {
         userInfo.TenantId,
         userInfo.EntityItemId
       );
+      showSkeletonTable.value = false;
       if (bookings.data) {
         const events = bookings.data.map((item) => ({
           title: item.Service.Name,
           start: item.StartDateTime,
           end: item.EndDateTime,
           extendedProps: {
+            EntityItemId: item.EntityItemId,
             GuestName: item.GuestName,
-            PhoneNumber: item.Phone
+            PhoneNumber: item.Phone,
+            Service: {
+              ID: item.Service.Id,
+              Value: item.Service.Name,
+
+            },
           },
           backgroundColor: item.Service.BackgroundColor,
         }));
@@ -561,6 +607,7 @@ const listBookings = async () => {
       }
     }
   } catch (error) {
+    showSkeletonTable.value = false;
     console.error("List bookings error:", error);
   }
 };
@@ -639,20 +686,22 @@ onMounted(async () => {
   /* font-size: 1.5rem; */
   font-weight: bold;
 }
-
+/* .fc .fc-button-group {
+  margin-left: 8px;
+} */
 .fc-event-title-container {
   /* padding: 5px; */
   box-sizing: border-box;
   /* font-size: 12px; */
 }
-.grid-container {
+/* .grid-container { */
   /* display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 1fr;  */
   /* display: flex;
   flex: wrap;
   justify-content: space-between; */
-}
+/* } */
 /* .grid-container .grid-item {
 } */
 

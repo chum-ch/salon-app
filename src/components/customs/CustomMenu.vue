@@ -26,10 +26,15 @@
         <router-link to="/calendar" @click="visible = false">
           <p>Calendars</p>
         </router-link>
-        <router-link to="/user" @click="visible = false"
+        <router-link to="/users" @click="visible = false"
           v-show="isAdmin"
         >
           <p>Users</p>
+        </router-link>
+        <router-link to="/bookings" @click="visible = false"
+          v-show="isAdmin"
+        >
+          <p>Bookings</p>
         </router-link>
       </div>
       <template #footer>
