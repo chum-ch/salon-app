@@ -41,7 +41,7 @@
             </PriMessage>
           </div>
           <div class="w-full mb-2">
-          <span>លេខទូរស័ព្ទ</span>
+            <span>លេខទូរស័ព្ទ</span>
             <PriInputText
               name="Phone"
               type="text"
@@ -106,28 +106,48 @@
               iconDisplay="input"
               dateFormat="yy-mm-dd"
               breakpoint="769px"
-              disabled
             />
           </div>
-          <CustomButton
-            type="submit"
-            :severity="true"
-            :label="'កក់សេវាកម្មឥឡូវ'"
-            class="w-full my-4"
-            :loading="loading"
-            :disabled="
-              !initialValues.GuestName ||
-              !initialValues.Phone ||
-              !initialValues.StartDateTime ||
-              !initialValues.EndDateTime ||
-              $form.EndDateTime?.invalid ||
-              $form.GuestName?.invalid ||
-              $form.Phone?.invalid ||
-              $form.StartDateTime?.invalid ||
-              !serviceSelection?.Value ||
-              loading
-            "
-          />
+          <div class="w-full flex justify-content-end" v-if="!isShowEditBtn">
+            <PriButton
+              type="submit"
+              :label="'កក់ឥឡូវ'"
+              class="p-0 px-3 my-4"
+              :loading="loading"
+              :disabled="
+                !initialValues.GuestName ||
+                !initialValues.Phone ||
+                !initialValues.StartDateTime ||
+                !initialValues.EndDateTime ||
+                $form.EndDateTime?.invalid ||
+                $form.GuestName?.invalid ||
+                $form.Phone?.invalid ||
+                $form.StartDateTime?.invalid ||
+                !serviceSelection?.Value ||
+                loading
+              "
+            />
+          </div>
+          <div class="w-full flex justify-content-end" v-else>
+            <PriButton
+              type="submit"
+              :label="'រក្សាទុក'"
+              class="p-0 px-3 my-4"
+              :loading="loading"
+              :disabled="
+                !initialValues.GuestName ||
+                !initialValues.Phone ||
+                !initialValues.StartDateTime ||
+                !initialValues.EndDateTime ||
+                $form.EndDateTime?.invalid ||
+                $form.GuestName?.invalid ||
+                $form.Phone?.invalid ||
+                $form.StartDateTime?.invalid ||
+                !serviceSelection?.Value ||
+                loading
+              "
+            />
+          </div>
         </Form>
       </div>
     </template>
@@ -166,9 +186,9 @@
           <li class="">
             <div class="flex justify-between">
               <p class="w-7rem">លេខទូរស័ព្ទ:</p>
-              <a :href="`tel:${clickedEventDetails.PhoneNumber}`">
+              <a :href="`tel:${clickedEventDetails.Phone}`">
                 <!-- <i class="pi pi-phone"></i> -->
-                {{ clickedEventDetails.PhoneNumber }}</a
+                {{ clickedEventDetails.Phone }}</a
               >
             </div>
           </li>
@@ -197,11 +217,22 @@
             </div>
           </li>
         </ul>
-        <!-- <CustomButton
-          @onClick="handleEditEvent(clickedEventDetails)"
-          :label="'កែប្រែ'"
-          class="w-full my-4"
-        /> -->
+        <div class="w-full flex justify-content-end">
+          <PriButton
+            @click="handleEditEvent(clickedEventDetails)"
+            :label="'កែប្រែ'"
+            class="p-0 px-3 mx-3"
+          v-if="userInfo?.EntityItemId === clickedEventDetails.UserId || userInfo?.UserType === $constanceVariable.UserType.Owner"
+          />
+          <PriButton
+            @click="handleDeleteEvent(clickedEventDetails)"
+            :label="'លុប'"
+            severity="danger"
+            class="p-0 px-3"
+            :loading="loading"
+          v-if="userInfo?.EntityItemId === clickedEventDetails.UserId || userInfo?.UserType === $constanceVariable.UserType.Owner"
+          />
+        </div>
       </div>
     </template>
   </CustomDialog>
@@ -217,7 +248,7 @@ import listPlugin from "@fullcalendar/list";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import multiMonthPlugin from "@fullcalendar/multimonth";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
-import { z } from "zod";
+import { set, z } from "zod";
 import { Form } from "@primevue/forms";
 import SkeletonTableView from "@/views/SkeletonTableView.vue";
 const toast = useToast();
@@ -228,6 +259,7 @@ const selectionStart = ref(null);
 const dialogEvent = ref();
 const dialogDetailsEvent = ref();
 const loading = ref(false);
+const isShowEditBtn = ref(false);
 const $api = inject("$api");
 const $constanceVariable = inject("$constanceVariable");
 const $helperFun = inject("$helperFun");
@@ -327,10 +359,10 @@ const handleEventClick = (clickInfo) => {
     ServiceName: event.title,
     StartDateTime: event.startStr,
     EndDateTime: event.endStr,
-    ...event.extendedProps, // Include GuestName, PhoneNumber, etc.
+    ...event.extendedProps, // Include GuestName, Phone, etc.
   };
-
   // 2. Open the dialog
+  isShowEditBtn.value = false;
   dialogDetailsEvent.value.openDialog();
 };
 const calendarOptions = ref({
@@ -352,6 +384,14 @@ const calendarOptions = ref({
   select: (info) => {
     openDialogEVent(info.startStr, info.endStr);
   },
+  // eventDataTransform: function(eventData) {
+  //     if (eventData.extendedProps.EntityItemId !== userInfo?.EntityItemId) {
+  //       eventData.editable = false;
+  //     } else {
+  //       eventData.editable = true;
+  //     }
+  //     return eventData;
+  //   },
   // editable: true,
   // dragScroll: true,
   // Time
@@ -379,7 +419,7 @@ const calendarOptions = ref({
   eventClick: handleEventClick,
   eventDidMount: function (info) {
     const guestName = info.event.extendedProps.GuestName || "";
-    const ph = info.event.extendedProps.PhoneNumber || "";
+    const ph = info.event.extendedProps.Phone || "";
     const title = info.event.title || "";
 
     if (info.el.querySelector(".fc-event-title")) {
@@ -400,7 +440,7 @@ const calendarOptions = ref({
       extendedProps: {
         // className: '',
         GuestName: "",
-        PhoneNumber: "",
+        Phone: "",
       },
       //   backgroundColor: "green",
     },
@@ -411,11 +451,11 @@ const calendarOptions = ref({
   customButtons: {
     // Defines a new custom button named 'createEventButton'
     createEventButton: {
-      text: 'បង្កើតថ្មី',
-      click: function() {
+      text: "បង្កើតថ្មី",
+      click: function () {
         dialogEvent.value.openDialog();
-      }
-    }
+      },
+    },
   },
   headerToolbar: {
     // left: "today,timeGridDay,timeGridWeek,dayGridMonth,multiMonthYear,listMonth",
@@ -523,17 +563,19 @@ const endSelection = () => {
 };
 
 const openDialogEVent = (startDateTime, endDateTime = null) => {
-  console.log('i', initialValues.value);
-  
   initialValues.value.StartDateTime = new Date(startDateTime);
   handleEndDateTime(endDateTime || startDateTime);
+  isShowEditBtn.value = false;
   dialogEvent.value.openDialog();
 };
 const handleEndDateTime = (endDateTime) => {
   endDate.value = endDateTime;
-  const endDateT = new Date(endDateTime);
+  const endDateT = $helperFun.getLocalISOStr(
+    endDateTime,
+    $constanceVariable.ReturnDateType.OBJ_DATE
+  );
   const addMinutes = serviceSelection.value
-    ? serviceSelection.value.Duration
+    ? serviceSelection.value.Duration || 0
     : 0;
   endDateT.setMinutes(endDateT.getMinutes() + addMinutes);
   initialValues.value.EndDateTime = endDateT;
@@ -562,14 +604,51 @@ const loadBookingsFromSessionStorage = async () => {
     calendarOptions.value.events = bookings;
   }
 };
+const handleDeleteEvent = async (eventEdit) => {
+  try {
+    loading.value = true;
+    setTimeout(async () => {
+      try {
+        toast.add({
+          severity: "success",
+          summary: "Form is submitted.",
+          life: 3000,
+        });
+
+        await $api.salon.deleteBooking(
+          userInfo.TenantId,
+          userInfo.EntityItemId,
+          eventEdit.EntityItemId
+        );
+        loading.value = false;
+        listBookings();
+        dialogDetailsEvent.value.closeDialog();
+      } catch (error) {
+        loading.value = false;
+        console.error("Delete event error:", error);
+      }
+    }, 2000);
+  } catch (error) {
+    console.error("Delete event error:", error);
+  }
+};
 const handleEditEvent = (eventEdit) => {
-  console.log('eventEdit', eventEdit);
-  initialValues.value.GuestName = eventEdit.GuestName;
-  initialValues.value.Phone = eventEdit.PhoneNumber;
-  initialValues.value.Service = eventEdit.ServiceName;
-  initialValues.value.StartDateTime = $helperFun.getLocalISOStr(eventEdit.StartDateTime, $constanceVariable.ReturnDateType.OBJ_DATE);
-  initialValues.value.EndDateTime = $helperFun.getLocalISOStr(eventEdit.EndDateTime, $constanceVariable.ReturnDateType.OBJ_DATE);
+  isShowEditBtn.value = true;
   serviceSelection.value = eventEdit.Service;
+  initialValues.value.GuestName = eventEdit.GuestName;
+  initialValues.value.Phone = eventEdit.Phone;
+  initialValues.value.StartDateTime = $helperFun.getLocalISOStr(
+    eventEdit.StartDateTime,
+    $constanceVariable.ReturnDateType.OBJ_DATE
+  );
+  initialValues.value.EndDateTime = $helperFun.getLocalISOStr(
+    eventEdit.EndDateTime,
+    $constanceVariable.ReturnDateType.OBJ_DATE
+  );
+  endDate.value = $helperFun.getLocalISOStr(
+    eventEdit.EndDateTime,
+    $constanceVariable.ReturnDateType.OBJ_DATE
+  );
   dialogEvent.value.openDialog();
 };
 
@@ -587,13 +666,14 @@ const listBookings = async () => {
           start: item.StartDateTime,
           end: item.EndDateTime,
           extendedProps: {
+            UserId: item.UserId,
             EntityItemId: item.EntityItemId,
             GuestName: item.GuestName,
-            PhoneNumber: item.Phone,
+            Phone: item.Phone,
             Service: {
               ID: item.Service.Id,
               Value: item.Service.Name,
-
+              Duration: item.Service.Duration,
             },
           },
           backgroundColor: item.Service.BackgroundColor,
@@ -627,27 +707,46 @@ const submitEvent = (e) => {
           Name: serviceSelection.value.Value,
           Id: serviceSelection.value.ID,
         };
-        const body = {
-          GuestName: initialValues.value.GuestName,
-          Phone: initialValues.value.Phone,
-          Service: initialValues.value.Service,
-          EndDateTime: $helperFun.getLocalISOStr(
-            initialValues.value.EndDateTime,
-            $constanceVariable.ReturnDateType.ISO_STR
-          ),
-          StartDateTime: $helperFun.getLocalISOStr(
-            initialValues.value.StartDateTime,
-            $constanceVariable.ReturnDateType.ISO_STR
-          ),
-        };
         if (userInfo) {
-          await $api.salon.createBooking(
-            userInfo.TenantId,
-            userInfo.EntityItemId,
-            body
-          );
+          const body = {
+            GuestName: initialValues.value.GuestName,
+            Phone: initialValues.value.Phone,
+            Service: initialValues.value.Service,
+            EndDateTime: $helperFun.getLocalISOStr(
+              initialValues.value.EndDateTime,
+              $constanceVariable.ReturnDateType.ISO_STR
+            ),
+            StartDateTime: $helperFun.getLocalISOStr(
+              initialValues.value.StartDateTime,
+              $constanceVariable.ReturnDateType.ISO_STR
+            ),
+          };
+          if (isShowEditBtn.value && clickedEventDetails.value.EntityItemId) {
+            const { data } = await $api.salon.updateBooking(
+              userInfo.TenantId,
+              userInfo.EntityItemId,
+              clickedEventDetails.value.EntityItemId,
+              body
+            );
+            clickedEventDetails.value = {
+              ...data,
+              Service: {
+                ID: data.Service.Id,
+                Value: data.Service.Name,
+                Duration: data.Service.Duration,
+              },
+              ServiceName: data.Service.Name,
+            };
+          } else {
+            await $api.salon.createBooking(
+              userInfo.TenantId,
+              userInfo.EntityItemId,
+              body
+            );
+          }
         }
         loading.value = false;
+        isShowEditBtn.value = false;
         await listBookings();
         closeDialogEvent();
       } catch (error) {
@@ -695,10 +794,10 @@ onMounted(async () => {
   /* font-size: 12px; */
 }
 /* .grid-container { */
-  /* display: grid;
+/* display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 1fr;  */
-  /* display: flex;
+/* display: flex;
   flex: wrap;
   justify-content: space-between; */
 /* } */

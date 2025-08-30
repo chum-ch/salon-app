@@ -297,7 +297,7 @@ defineExpose({
         <div v-if="tableData.length !== 0 || tableData.length === 0" class="">
           <span class="text-red-500 font-bold">
             {{ filters["global"].value }}</span
-          > មិនមានទិន្នន័យ!
+          > មិនទាន់មានទិន្នន័យ!
         </div>
       </template>
       <Column

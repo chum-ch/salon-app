@@ -62,14 +62,12 @@ const openMenu = () => {
     <div v-show="true" class="sticky top-0 z-1">
       <div class="container-menu">
         <PriButton
-          class=" icon-bars color-primary mx-2"
+          class="icon-bars color-primary mx-2"
           icon="pi pi-bars"
           @click="openMenu"
-          v-if="$route.path !=='/' && $route.path !=='/signup'"
+          v-if="$route.path !== '/' && $route.path !== '/signup'"
         />
-        <div class="register"
-          v-else
-        >
+        <div class="register" v-else>
           <PriButton
             type="button"
             label="ការចុះឈ្មោះ"
@@ -77,6 +75,9 @@ const openMenu = () => {
             @click="route.push('/signup')"
           />
         </div>
+        <!-- <div class="w-2rem h-2rem">
+          <img src="/imgs/salon.png" alt="logo" class="logo" width="" style="width: 100%;" />
+        </div> -->
       </div>
     </div>
     <CustomMenu ref="refToFunMenu" />
@@ -107,7 +108,7 @@ h3 {
 .container-menu {
   /* display: flex;
   justify-content: space-between; */
-  padding: 0.3rem 0; 
+  padding: 0.3rem 0;
   backdrop-filter: blur(10px);
   background-color: #11c29000; /* Optional: Adds a translucent color to enhance the effect */
 }
