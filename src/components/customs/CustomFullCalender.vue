@@ -217,7 +217,7 @@
             </div>
           </li>
         </ul>
-        <div class="w-full flex justify-content-end">
+        <div class="w-full flex justify-content-end mt-4">
           <PriButton
             @click="handleEditEvent(clickedEventDetails)"
             :label="'កែប្រែ'"

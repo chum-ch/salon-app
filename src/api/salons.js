@@ -35,4 +35,17 @@ export default (axios)=>({
   deleteBooking(tenantId, userId, bookingId){
     return axios.delete(`${userApi}/tenants/${tenantId}/users/${userId}/bookings/${bookingId}`)
   },
+
+  // Upload image
+  uploadImage(tenantId, userId, serviceId, formData){
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    return axios.post(`${userApi}/tenants/${tenantId}/users/${userId}/services/${serviceId}/images`, formData, config)
+  },
+  listImages(tenantId, userId, serviceId){
+    return axios.get(`${userApi}/tenants/${tenantId}/users/${userId}/services/${serviceId}/images`, data)
+  },
 })

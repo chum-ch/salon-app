@@ -36,6 +36,8 @@ import Tooltip from 'primevue/tooltip';
 import DatePicker from 'primevue/datepicker';
 import Skeleton from 'primevue/skeleton';
 
+
+
 // My Customs
 import CustomButton from "./components/customs/CustomButton.vue";
 import CustomDialog from "./components/customs/CustomDialog.vue";
@@ -44,6 +46,7 @@ import CustomMenu from "./components/customs/CustomMenu.vue";
 import CustomDropdown from "./components/customs/CustomDropdown.vue";
 import CustomFullCalender from "./components/customs/CustomFullCalender.vue";
 import CustomTable from './components/customs/CustomTable.vue';
+import CustomUploadImage from './components/customs/CustomUploadImage.vue';
 const pinia = createPinia()
 const app = createApp(App)
 
@@ -101,6 +104,7 @@ app.component("CustomMenu", CustomMenu);
 app.component("CustomDropdown", CustomDropdown);
 app.component("CustomFullCalender", CustomFullCalender);
 app.component("CustomTable", CustomTable);
+app.component("CustomUploadImage", CustomUploadImage);
 app.directive('tooltip', Tooltip);
 app.provide("$api", API(axios));
 app.provide("$constanceVariable", ConstanceVariable);
