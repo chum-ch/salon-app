@@ -26,4 +26,9 @@ npm run dev
 
 ```sh
 npm run build
+
+## Clean cache
+
+```sh
+npm cache clean --force
 ```

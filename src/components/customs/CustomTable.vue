@@ -32,6 +32,11 @@ const props = defineProps({
     required: false,
     default: () => true,
   },
+  isShowSelectionMode: {
+    type: Boolean,
+    required: false,
+    default: () => true,
+  },
   isShowPaginator: {
     type: Boolean,
     required: false,
@@ -300,11 +305,12 @@ defineExpose({
           > មិនទាន់មានទិន្នន័យ!
         </div>
       </template>
-      <Column
+      <!-- <Column
+        v-if="isShowSelectionMode"
         :selectionMode="selectionMode"
         :headerStyle="selectionMode === '' ? 'width: 0rem' : 'width: 3rem'"
       >
-      </Column>
+      </Column> -->
       <Column
         v-for="(item, index) in columns"
         :key="index"

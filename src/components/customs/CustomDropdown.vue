@@ -9,6 +9,10 @@ const props = defineProps({
   messageError: String,
   label: String,
   modelValue: [String, Object, Number],
+  showClear: {
+    type: Boolean,
+    default: () => false,
+  }
 });
 
 const selectedValue = ref();
@@ -46,6 +50,7 @@ watch(
         v-model="selectedValue"
         :options="options"
         filter
+        :showClear="showClear"
         @filter="handleFilterChange"
         :placeholder="placeholder"
         :filterPlaceholder="'ស្វែងរក'"

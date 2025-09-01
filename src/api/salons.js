@@ -45,7 +45,7 @@ export default (axios)=>({
     };
     return axios.post(`${userApi}/tenants/${tenantId}/users/${userId}/services/${serviceId}/images`, formData, config)
   },
-  listImages(tenantId, userId, serviceId){
-    return axios.get(`${userApi}/tenants/${tenantId}/users/${userId}/services/${serviceId}/images`, data)
+  listImages(tenantId, userId){
+    return axios.get(`${userApi}/tenants/${tenantId}/users/${userId}/images`)
   },
 })

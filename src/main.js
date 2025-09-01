@@ -47,6 +47,7 @@ import CustomDropdown from "./components/customs/CustomDropdown.vue";
 import CustomFullCalender from "./components/customs/CustomFullCalender.vue";
 import CustomTable from './components/customs/CustomTable.vue';
 import CustomUploadImage from './components/customs/CustomUploadImage.vue';
+import CustomTabs from './components/customs/CustomTabs.vue';
 const pinia = createPinia()
 const app = createApp(App)
 
@@ -105,6 +106,7 @@ app.component("CustomDropdown", CustomDropdown);
 app.component("CustomFullCalender", CustomFullCalender);
 app.component("CustomTable", CustomTable);
 app.component("CustomUploadImage", CustomUploadImage);
+app.component("CustomTabs", CustomTabs);
 app.directive('tooltip', Tooltip);
 app.provide("$api", API(axios));
 app.provide("$constanceVariable", ConstanceVariable);

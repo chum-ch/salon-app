@@ -1,5 +1,14 @@
 <template>
   <div class="file-uploader">
+    <CustomDropdown
+      :placeholder="'ជ្រើសរើសសេវាកម្ម'"
+      :options="serviceOptions"
+      :label="'ឈ្មោះសេវាកម្ម'"
+      :required="isRequired"
+      class="p-0 w-full mb-1"
+      v-model="serviceSelection"
+      @update:modelValue="getSelectOptionChange"
+    />
     <file-pond
       name="image-upload"
       ref="pond"
@@ -20,13 +29,16 @@
       :allow-image-filter="true"
     />
 
-    <button @click="submitFiles" :disabled="selectedFile.length === 0">
+    <button
+      @click="submitFiles"
+      :disabled="selectedFile.length === 0 || isRequired"
+    >
       📤 Upload Files
     </button>
   </div>
 </template>
 <script setup>
-import { ref, inject } from "vue";
+import { ref, inject, getCurrentInstance } from "vue";
 
 // Import Vue FilePond
 import vueFilePond from "vue-filepond";
@@ -63,15 +75,33 @@ const FilePond = vueFilePond(
 // --- Component State ---
 const pond = ref(null); // Reference to the FilePond instance
 const selectedFile = ref([]); // Holds the current list of files
+const isRequired = ref(true);
 const $api = inject("$api");
 const $constanceVariable = inject("$constanceVariable");
 const $helperFun = inject("$helperFun");
+const instance = getCurrentInstance();
 
 const userInfo = $helperFun.getSessionItem(
   $constanceVariable.SessionStorageKey.UserInfo
 );
 // --- Methods ---
 
+let allServiceItems = $helperFun.getSessionItem(
+  $constanceVariable.SessionStorageKey.AllServicesItems
+);
+if (allServiceItems) {
+  allServiceItems = allServiceItems.map((item) => ({
+    Value: item.Name,
+    ID: item.EntityItemId,
+    Duration: item.Duration,
+  }));
+}
+const serviceOptions = ref(allServiceItems);
+const serviceSelection = ref();
+
+const getSelectOptionChange = async () => {
+  isRequired.value = false;
+};
 // This handler updates our local file list when files are added or removed
 const handleFileUpdate = (fileItems) => {
   selectedFile.value = fileItems.map((item) => item.file);
@@ -80,6 +110,13 @@ const handleFileUpdate = (fileItems) => {
 // **NEW**: This handler is called after all files have been processed
 const handleUploadComplete = async () => {
   selectedFile.value = [];
+  isRequired.value = true;
+  const servicesImg = await $api.salon.listImages(
+    userInfo.TenantId,
+    userInfo.EntityItemId,
+    serviceSelection.value.ID
+  );
+  instance.emit("update:modelValue", servicesImg.data);
 };
 
 const serverOptions = {
@@ -95,6 +132,11 @@ const serverOptions = {
     transfer,
     options
   ) => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+    if (isRequired.value) {
+      error("សូមជ្រើសរើសសេវាកម្ម");
+    }
     // 1. Prepare the data for your upload function
     const formData = new FormData();
     formData.append("images", file);
@@ -103,14 +145,15 @@ const serverOptions = {
       .uploadImage(
         userInfo.TenantId,
         userInfo.EntityItemId,
-        "Service:d77dad0566424bd28828d11c8b0d6d79",
+        serviceSelection.value.ID,
         formData,
         (p) => {
           // The `p` here is the percentage from your `onUploadProgress` callback
           console.log("P", p, progress);
 
           progress(true, p, 100);
-        }
+        },
+        signal // Pass the signal to your upload function
       )
       .then((response) => {
         // When the server responds successfully, call the `load` callback
@@ -120,17 +163,25 @@ const serverOptions = {
         load(fileId);
       })
       .catch((err) => {
-        // If there is an error, call the `error` callback with a message
-        error(err.message || "Upload failed");
+        // **IMPROVED**: Differentiate between cancel and other errors
+        if (err.name === "CanceledError") {
+          console.log("Upload aborted by user.");
+          return;
+        }
+        // Extract a meaningful error message
+        const errorMessage =
+          err.response?.data?.message ||
+          err.message ||
+          "Upload failed. Please try again.";
+        error(errorMessage);
+        console.error("Upload error:", errorMessage, err);
       });
 
     // 3. (Optional but recommended) Return an object with an `abort` method
     // This allows FilePond to cancel the request if the user clicks the "cancel" button.
     return {
       abort: () => {
-        // You would need a way to cancel the Axios request here
-        // e.g., using `CancelToken` from Axios
-        console.log("Upload aborted");
+        abortController.abort();
       },
     };
   },
@@ -145,6 +196,7 @@ const submitFiles = () => {
     console.error("FilePond instance not found.");
   }
 };
+defineEmits(["update:modelValue"]);
 </script>
 
 <style>
@@ -165,7 +217,6 @@ const submitFiles = () => {
 }
 .filepond--drop-label.filepond--drop-label label {
   cursor: pointer;
-
 }
 .file-uploader {
   max-width: 500px;
@@ -175,7 +226,6 @@ const submitFiles = () => {
 .file-uploader button {
   width: 100%;
   padding: 12px;
-  margin-top: 1rem;
   background-color: var(--p2-color);
   color: white;
   border: none;

@@ -24,17 +24,17 @@
           <p>Services</p>
         </router-link>
         <router-link to="/calendar" @click="visible = false">
-          <p>Calendars</p>
+          <p>Schedules</p>
         </router-link>
-        <router-link to="/users" @click="visible = false"
-          v-show="isAdmin"
-        >
+
+        <router-link to="/bookings" @click="visible = false" v-show="isAdmin">
+          <p>Bookings</p>
+        </router-link>
+        <router-link to="/users" @click="visible = false" v-show="isAdmin">
           <p>Users</p>
         </router-link>
-        <router-link to="/bookings" @click="visible = false"
-          v-show="isAdmin"
-        >
-          <p>Bookings</p>
+        <router-link to="/image" @click="visible = false">
+          <p>Images</p>
         </router-link>
       </div>
       <template #footer>
@@ -82,7 +82,9 @@ onUpdated(() => {
   userInfo.value = $helperFun.getSessionItem(
     $constanceVariable.SessionStorageKey.UserInfo
   );
-  if (userInfo.value) isAdmin.value = userInfo.value.UserType === $constanceVariable.UserType.Owner;
+  if (userInfo.value)
+    isAdmin.value =
+      userInfo.value.UserType === $constanceVariable.UserType.Owner;
 });
 </script>
 <style scoped>
