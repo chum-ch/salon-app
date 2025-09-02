@@ -24,6 +24,9 @@
   <div v-else-if="error" class="photo-grid-status photo-grid-error">
     {{ error }}
   </div>
+  <div v-else-if="images.length === 0" class="photo-grid-status photo-grid-error">
+    មិនទាន់មានរូបភាព!
+  </div>
   <div v-else class="photo-grid">
     <img
       v-for="(image, index) in images"
@@ -37,9 +40,9 @@
 
   <div v-if="showModal" class="image-modal-overlay" @click="closeModal">
     <div class="image-modal-content">
-      <div class="close-button" @click.stop="closeModal">
+      <!-- <div class="close-button" @click.stop="closeModal">
         <span>&times;</span>
-      </div>
+      </div> -->
       <img
         :src="currentImage.Url"
         :alt="currentImage.alt"
@@ -303,6 +306,6 @@ onMounted(async () => {
   top: 50%;
   left: 50%;
   font-weight: bold;
-  transform: translate(-50%, -55%);
+  transform: translate(-50%, -50%);
 }
 </style>

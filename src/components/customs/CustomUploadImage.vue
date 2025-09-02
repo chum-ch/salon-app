@@ -97,7 +97,7 @@ if (allServiceItems) {
   }));
 }
 const serviceOptions = ref(allServiceItems);
-const serviceSelection = ref();
+const serviceSelection = ref({});
 
 const getSelectOptionChange = async () => {
   isRequired.value = false;
@@ -113,8 +113,7 @@ const handleUploadComplete = async () => {
   isRequired.value = true;
   const servicesImg = await $api.salon.listImages(
     userInfo.TenantId,
-    userInfo.EntityItemId,
-    serviceSelection.value.ID
+    userInfo.EntityItemId
   );
   instance.emit("update:modelValue", servicesImg.data);
 };
