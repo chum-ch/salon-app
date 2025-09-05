@@ -31,6 +31,7 @@
               placeholder="ឈ្មោះរបស់អ្នក"
               fluid
               v-model="initialValues.GuestName"
+              :disabled="loading"
             />
             <PriMessage
               v-if="$form.GuestName?.invalid"
@@ -48,6 +49,7 @@
               placeholder="លេខទូរស័ព្ទរបស់អ្នក"
               fluid
               v-model="initialValues.Phone"
+              :disabled="loading"
             />
             <PriMessage
               v-if="$form.Phone?.invalid"
@@ -65,6 +67,7 @@
               class="col-12 p-0"
               v-model="serviceSelection"
               @update:modelValue="getSelectOptionChange"
+              :disabled="loading"
             />
             <PriMessage
               v-if="$form.ServiceName?.invalid"
@@ -90,6 +93,7 @@
               breakpoint="769px"
               :stepMinute="5"
               @value-change="handleDateChange"
+              :disabled="loading"
             />
           </div>
           <div class="w-full mb-2">
@@ -106,6 +110,7 @@
               iconDisplay="input"
               dateFormat="yy-mm-dd"
               breakpoint="769px"
+              :disabled="loading"
             />
           </div>
           <div class="w-full flex justify-content-end" v-if="!isShowEditBtn">
@@ -351,14 +356,16 @@ if (window.innerWidth < 768) {
 
 // Function to handle the click
 const handleEventClick = (clickInfo) => {
+  
   // 1. Extract necessary event data
   const event = clickInfo.event;
+  console.log(event);
 
   // Store event data, including extended props, in a reactive variable
   clickedEventDetails.value = {
-    ServiceName: event.title,
-    StartDateTime: event.startStr,
-    EndDateTime: event.endStr,
+    // ServiceName: event.title,
+    // StartDateTime: event.startStr,
+    // EndDateTime: event.endStr,
     ...event.extendedProps, // Include GuestName, Phone, etc.
   };
   // 2. Open the dialog
@@ -404,7 +411,7 @@ const calendarOptions = ref({
   selectable: true,
   selectMirror: true,
   expandRows: true,
-  height: 650,
+  // height: 650,
   handleWindowResize: true,
   // navLinks: false, // can click day/week names to navigate views
   weekNumbers: true,
@@ -584,7 +591,7 @@ const handleDateChange = (startDateTimeChange) => {
   handleEndDateTime(startDateTimeChange);
 };
 const closeDialogEvent = () => {
-  initialValues.value = objModel;
+  initialValues.value = {...objModel};
   serviceSelection.value = itemService;
   dialogEvent.value.closeDialog();
 };
@@ -623,6 +630,7 @@ const handleDeleteEvent = async (eventEdit) => {
         loading.value = false;
         listBookings();
         dialogDetailsEvent.value.closeDialog();
+        closeDialogEvent();
       } catch (error) {
         loading.value = false;
         console.error("Delete event error:", error);
@@ -666,6 +674,9 @@ const listBookings = async () => {
           start: item.StartDateTime,
           end: item.EndDateTime,
           extendedProps: {
+            ServiceName: item.Service.Name,
+            StartDateTime: item.StartDateTime,
+            EndDateTime: item.EndDateTime,
             UserId: item.UserId,
             EntityItemId: item.EntityItemId,
             GuestName: item.GuestName,

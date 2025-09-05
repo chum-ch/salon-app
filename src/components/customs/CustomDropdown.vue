@@ -12,6 +12,10 @@ const props = defineProps({
   showClear: {
     type: Boolean,
     default: () => false,
+  },
+  disabled: {
+    type: Boolean,
+    default: () => false,
   }
 });
 
@@ -58,6 +62,7 @@ watch(
         :invalid="required && !selectedValue && messageError ? true : false"
         @update:modelValue="updateModelValue"
         :resetFilterOnHide="true"
+        :disabled="disabled"
       >
         <template #content> </template>
         <template #value="slotProps">

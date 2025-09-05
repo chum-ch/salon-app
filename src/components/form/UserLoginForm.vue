@@ -23,6 +23,7 @@
               :min="0"
               fluid
               v-model="initialValues.ShopOwnerCode"
+              :disabled="loading"
             />
             <PriMessage
               v-if="$form.ShopOwnerCode?.invalid"
@@ -41,6 +42,7 @@
               placeholder="លេខទូរស័ព្ទរបស់អ្នក"
               fluid
               v-model="initialValues.PhoneNumber"
+              :disabled="loading"
             />
             <PriMessage
               v-if="$form.PhoneNumber?.invalid"
@@ -58,6 +60,7 @@
               placeholder="ឈ្មោះរបស់អ្នក"
               fluid
               v-model="initialValues.FullName"
+              :disabled="loading"
             />
             <PriMessage
               v-if="$form.FullName?.invalid"

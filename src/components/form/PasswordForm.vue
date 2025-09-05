@@ -26,6 +26,7 @@
               autocomplete
               fluid
               v-model="initialValues.Password"
+              :disabled="loading"
             />
             <PriMessage
               v-if="$form.Password?.invalid"

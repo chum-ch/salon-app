@@ -1,12 +1,13 @@
 <script setup>
 import { inject, onMounted, ref } from 'vue';
-
+import SkeletonTableView from './SkeletonTableView.vue';
 const $api = inject('$api')
 const $constanceVariable = inject('$constanceVariable')
 const $helperFun = inject('$helperFun')
 const userInfo = $helperFun.getSessionItem(
   $constanceVariable.SessionStorageKey.UserInfo
 );
+const showSkeletonTable = ref(true);
 const selectedUsers = ref([]);
 const tableDataUsers = ref([]);
 const columnsUser = ref([
@@ -31,6 +32,7 @@ onMounted( async() => {
         userInfo.EntityItemId
       );
       tableDataUsers.value = users.data;
+      showSkeletonTable.value = false;
     }
   } catch (error) {
     console.error('Error list users', error)
@@ -39,7 +41,12 @@ onMounted( async() => {
 </script>
 
 <template>
-  <div class="list-users">
+  <SkeletonTableView 
+    v-if="showSkeletonTable && tableDataUsers.length === 0"
+  />
+  <div class="list-users"
+    v-else
+  >
     <CustomTable
       ref="refToChildCustomTable"
       :tableData="tableDataUsers"
